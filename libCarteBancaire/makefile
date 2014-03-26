@@ -1,10 +1,4 @@
-all:	TestAchatVente TestMessage TestRedirection
-
-PrixAchatVente.o:	PrixAchatVente.c PrixAchatVente.h
-	gcc -c PrixAchatVente.c 
-
-TestAchatVente:	PrixAchatVente.o TestAchatVente.c
-	gcc PrixAchatVente.o TestAchatVente.c -o TestAchatVente
+all:	 TestMessage TestRedirection
 
 message.o: message.c message.h
 	gcc -Wall -c message.c

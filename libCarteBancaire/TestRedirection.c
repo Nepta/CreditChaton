@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
         case 0:
             /* code du fils */
             /* on fait en sorte que lorsque le processus 
-               écrira sur la sortie standard (1) 
+               écrira sur l'entrée standard (1) 
                il le fera en fait dans le pipe (fdpipe[1])
             */
             dup2(fdpipe[1], 1);
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         default :
             /* code du père */  
             /* on fait en sorte que lorsque le processus 
-               lira sur l'entrée standard (0) 
+               lira sur la sortie standard (0) 
                il le fera en fait dans le pipe (fdpipe[0])
             */
             dup2(fdpipe[0], 0);

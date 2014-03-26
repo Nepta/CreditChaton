@@ -1,5 +1,6 @@
-#ifndef _MESSAGEH_
-#define _MESSAGEH_
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 /**
  * Decoupe du message 
@@ -9,13 +10,19 @@
  *   Les variables emeteur, destinataire, commande, identifiant
  *   et sms doivent être allouées avant l'appel à decoupe
  */
-
 int decoupe(char *message,      /* Source a découper */
-	    char *emeteur,      /* Emeteur du message */
+	    char *cb,           /* no de carte concernee */
 	    char *type,         /* Type du message */
-	    char *action,       /* Idebtificateur de l'action */
 	    char *valeur        /* Valeur associée au message */
-	    );
+	    )
+{
+  int nb=sscanf(message, "|%[^|]|%[^|]|%[^|]|\n", 
+	 cb, type, valeur);
+  if (nb == 3)
+    return 1;
+  else 
+    return 0;
+}
 
 /** 
  * Construction du message
@@ -23,7 +30,15 @@ int decoupe(char *message,      /* Source a découper */
  * a partir des arguments
  * Le message est alloué dans la fonction
  */
-char* message(char *emeteur, char *type, char *action, 
-	      char * valeur);
+char* message(char *cb, char *type, char * valeur)
+{
+  int longueur = strlen(cb) + strlen(type) + strlen(valeur) + 1 + 5 + 1;
+  char *mess = calloc(longueur,sizeof(char));
 
-#endif // _MESSAGEH_
+  if (mess == NULL)
+    return NULL;
+  
+  sprintf(mess, "|%s|%s|%s|\n", cb, type, valeur);
+
+  return mess;
+}
