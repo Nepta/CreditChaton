@@ -1,0 +1,5 @@
+gmon.out
+obj/
+exec
+premake4.lua
+test
