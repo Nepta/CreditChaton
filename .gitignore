@@ -4,3 +4,4 @@ exec
 premake4.lua
 test
 *.a
+terminal

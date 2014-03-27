@@ -2,19 +2,19 @@
 # Type "make help" for usage help
 
 ifndef config
-  config=
+  config=debug
 endif
 export config
 
-PROJECTS := exec libCarteBancaire test
+PROJECTS := terminal libCarteBancaire test
 
 .PHONY: all clean help $(PROJECTS)
 
 all: $(PROJECTS)
 
-exec: libCarteBancaire
-	@echo "==== Building exec ($(config)) ===="
-	@${MAKE} --no-print-directory -C . -f exec.make
+terminal: libCarteBancaire
+	@echo "==== Building terminal ($(config)) ===="
+	@${MAKE} --no-print-directory -C . -f terminal.make
 
 libCarteBancaire: 
 	@echo "==== Building libCarteBancaire ($(config)) ===="
@@ -25,7 +25,7 @@ test:
 	@${MAKE} --no-print-directory -C . -f test.make
 
 clean:
-	@${MAKE} --no-print-directory -C . -f exec.make clean
+	@${MAKE} --no-print-directory -C . -f terminal.make clean
 	@${MAKE} --no-print-directory -C . -f libCarteBancaire.make clean
 	@${MAKE} --no-print-directory -C . -f test.make clean
 
@@ -33,12 +33,13 @@ help:
 	@echo "Usage: make [config=name] [target]"
 	@echo ""
 	@echo "CONFIGURATIONS:"
-	@echo "   "
+	@echo "   debug"
+	@echo "   release"
 	@echo ""
 	@echo "TARGETS:"
 	@echo "   all (default)"
 	@echo "   clean"
-	@echo "   exec"
+	@echo "   terminal"
 	@echo "   libCarteBancaire"
 	@echo "   test"
 	@echo ""
