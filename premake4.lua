@@ -25,7 +25,8 @@ solution "Template"
 		flags {"OptimizeSpeed"}
 		
 		files {"libCarteBancaire/alea.c",
-				 "libCarteBancaire/message.c",}
+				 "libCarteBancaire/message.c",
+				 "libCarteBancaire/gestionFichiers.c"}
 		
 	project "test"
 		kind "ConsoleApp"
