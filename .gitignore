@@ -3,3 +3,4 @@ obj/
 exec
 premake4.lua
 test
+*.a
