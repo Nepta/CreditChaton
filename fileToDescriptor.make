@@ -20,18 +20,18 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/debug/test
+  OBJDIR     = obj/debug/fileToDescriptor
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/test
+  TARGET     = $(TARGETDIR)/fileToDescriptor
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += 
-  LIBS      += 
+  LDFLAGS   += -L.
+  LIBS      += -llibCarteBancaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += 
+  LDDEPS    += liblibCarteBancaire.a
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
@@ -42,18 +42,18 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/test
+  OBJDIR     = obj/release/fileToDescriptor
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/test
+  TARGET     = $(TARGETDIR)/fileToDescriptor
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -Wall -g -std=c99
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += 
-  LIBS      += 
+  LDFLAGS   += -s -L.
+  LIBS      += -llibCarteBancaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += 
+  LDDEPS    += liblibCarteBancaire.a
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
@@ -64,6 +64,7 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
+	$(OBJDIR)/fileToDescriptor.o \
 
 RESOURCES := \
 
@@ -81,7 +82,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking test
+	@echo Linking fileToDescriptor
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -102,7 +103,7 @@ else
 endif
 
 clean:
-	@echo Cleaning test
+	@echo Cleaning fileToDescriptor
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -124,5 +125,8 @@ $(GCH): $(PCH)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 endif
 
+$(OBJDIR)/fileToDescriptor.o: src/fileToDescriptor.c
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
