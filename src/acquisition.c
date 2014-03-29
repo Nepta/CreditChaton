@@ -89,8 +89,8 @@ int main(int argc, char* argv[]){
 		Memory *serverHash = constrainedMalloc(10);
 		Memory *fifoName = constrainedMalloc(250);
 		serverHash->message.data[0] = '\0';
-		snprintf(serverHash->message.data,10,"%d%d", bankId, serverId);
-		printf("%s\n",serverHash->message.data);
+/*		snprintf(serverHash->message.data,10,"%d%d", bankId, serverId);*/
+		snprintf(serverHash->message.data,10,"%d", bankId);
 		Route route;
 		// create reading file (for incoming message)
 		fifoName->message.data[0] = '\0';
@@ -118,7 +118,23 @@ int main(int argc, char* argv[]){
 		mkfifo(strncat(strncat(fifoName->message.data,"resources/authOut",24),serverHash->message.data,24),DEFAULT); //authorisation -> this
 		route.authorisation.out = open(fifoName->message.data,O_WRONLY);
 
-		getchar();
+
+		// do some computation
+		char* string;
+		do{}while(!(string = litLigne(route.terminal.in)));
+		ecritLigne(route.terminal.out,string);
+		printf("terminal: %s\n",string);
+		free(string);
+		
+		do{}while(!(litLigne(route.interbancaire.in)));
+		ecritLigne(route.interbancaire.out,string);
+		printf("interbancaire: %s\n",string);
+		free(string);
+		
+		do{}while(!(litLigne(route.authorisation.in)));
+		ecritLigne(route.authorisation.out,string);
+		printf("authorisation: %s\n",string);
+		free(string);
 
 		
 		// delete fifo file
