@@ -12,8 +12,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include "communicationThread.h"
 
 int maxMemory;
+static pthread_mutex_t alloc_lock;
 
 struct charMemory{
 	unsigned char size;
@@ -29,6 +31,7 @@ typedef union{
 	struct charMemory message;
 	struct generalMemory generic;
 }Memory;
+
 
 typedef struct{
 	int in;
@@ -48,12 +51,15 @@ typedef struct{
  */
 
 Memory* constrainedMalloc(size_t size){
+	pthread_mutex_lock(&alloc_lock);
 	if((int)(maxMemory - (size + sizeof (Memory))) > 0){
 		maxMemory -= size + sizeof (Memory);
 		Memory *memory = malloc(size + sizeof (Memory));
 		memory->generic.size = size;
+		pthread_mutex_unlock(&alloc_lock);
 		return memory;
 	}else{
+		pthread_mutex_unlock(&alloc_lock);
 		errno = ENOMEM;
 		perror("no memory left");
 		return NULL;
@@ -80,6 +86,7 @@ void closeAll(Route route){
 	close(route.interbancaire.in);
 	close(route.interbancaire.out);
 }
+
 
 int main(int argc, char* argv[]){
 	if(argc == 3){
