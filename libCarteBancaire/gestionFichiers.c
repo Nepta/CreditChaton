@@ -17,7 +17,7 @@ char * litLigne(int fd)
     }
     i++;
   } while(c[i-1] != '\n');
-  c[i] = '\0';
+  c[i-1] = '\0';
   return c;
 }
 
