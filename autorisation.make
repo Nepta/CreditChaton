@@ -20,9 +20,9 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/debug/terminal
+  OBJDIR     = obj/debug/autorisation
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/terminal
+  TARGET     = $(TARGETDIR)/autorisation
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -42,9 +42,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/terminal
+  OBJDIR     = obj/release/autorisation
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/terminal
+  TARGET     = $(TARGETDIR)/autorisation
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -64,9 +64,9 @@ ifeq ($(config),release)
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/debug/terminal
+  OBJDIR     = obj/debug/autorisation
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/terminal
+  TARGET     = $(TARGETDIR)/autorisation
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -86,9 +86,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/terminal
+  OBJDIR     = obj/release/autorisation
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/terminal
+  TARGET     = $(TARGETDIR)/autorisation
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -108,7 +108,7 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/terminal.o \
+	$(OBJDIR)/autorisation.o \
 
 RESOURCES := \
 
@@ -126,7 +126,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking terminal
+	@echo Linking autorisation
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -147,7 +147,7 @@ else
 endif
 
 clean:
-	@echo Cleaning terminal
+	@echo Cleaning autorisation
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -169,7 +169,7 @@ $(GCH): $(PCH)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/terminal.o: src/terminal.c
+$(OBJDIR)/autorisation.o: src/autorisation.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 

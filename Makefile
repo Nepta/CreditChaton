@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := terminal fileToDescriptor libCarteBancaire test
+PROJECTS := terminal autorisation fileToDescriptor libCarteBancaire test
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -15,6 +15,10 @@ all: $(PROJECTS)
 terminal: libCarteBancaire
 	@echo "==== Building terminal ($(config)) ===="
 	@${MAKE} --no-print-directory -C . -f terminal.make
+
+autorisation: libCarteBancaire
+	@echo "==== Building autorisation ($(config)) ===="
+	@${MAKE} --no-print-directory -C . -f autorisation.make
 
 fileToDescriptor: libCarteBancaire
 	@echo "==== Building fileToDescriptor ($(config)) ===="
@@ -30,6 +34,7 @@ test:
 
 clean:
 	@${MAKE} --no-print-directory -C . -f terminal.make clean
+	@${MAKE} --no-print-directory -C . -f autorisation.make clean
 	@${MAKE} --no-print-directory -C . -f fileToDescriptor.make clean
 	@${MAKE} --no-print-directory -C . -f libCarteBancaire.make clean
 	@${MAKE} --no-print-directory -C . -f test.make clean
@@ -40,11 +45,14 @@ help:
 	@echo "CONFIGURATIONS:"
 	@echo "   debug"
 	@echo "   release"
+	@echo "   debug"
+	@echo "   release"
 	@echo ""
 	@echo "TARGETS:"
 	@echo "   all (default)"
 	@echo "   clean"
 	@echo "   terminal"
+	@echo "   autorisation"
 	@echo "   fileToDescriptor"
 	@echo "   libCarteBancaire"
 	@echo "   test"
