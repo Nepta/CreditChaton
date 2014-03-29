@@ -5,12 +5,15 @@
  */
 
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
 int maxMemory;
-
 
 struct charMemory{
 	unsigned char size;
@@ -27,6 +30,17 @@ typedef union{
 	struct generalMemory generic;
 }Memory;
 
+typedef struct{
+	int in;
+	int out;
+}Direction;
+
+typedef struct{
+	Direction terminal;
+	Direction authorisation;
+	Direction interbancaire;
+}Route;
+
 /**
  * try to allocate memory respecting the maximum memory the server must use
  * \param size size of memory we want to allocate
@@ -37,9 +51,10 @@ Memory* constrainedMalloc(size_t size){
 	if((int)(maxMemory - (size + sizeof (Memory))) > 0){
 		maxMemory -= size + sizeof (Memory);
 		Memory *memory = malloc(size + sizeof (Memory));
-		memory->message.size = size;
+		memory->generic.size = size;
 		return memory;
 	}else{
+		errno = ENOMEM;
 		perror("no memory left");
 		return NULL;
 	}
@@ -55,16 +70,78 @@ void constrainedFree(Memory* memory){
 	free(memory);
 }
 
+const int DEFAULT = 0644;
+
+void closeAll(Route route){
+	close(route.terminal.in);
+	close(route.terminal.out);
+	close(route.authorisation.in);
+	close(route.authorisation.out);
+	close(route.interbancaire.in);
+	close(route.interbancaire.out);
+}
+
 int main(int argc, char* argv[]){
 	if(argc == 3){
 		maxMemory = atoi(argv[2]);
 		int bankId = atoi(argv[1]);
 		pid_t serverId = getpid();
 		Memory *serverHash = constrainedMalloc(10);
+		Memory *fifoName = constrainedMalloc(250);
 		serverHash->message.data[0] = '\0';
-		snprintf((char*)(&serverHash->message.data),10,"%d%d", bankId, serverId);
+		snprintf(serverHash->message.data,10,"%d%d", bankId, serverId);
+		printf("%s\n",serverHash->message.data);
+		Route route;
+		// create reading file (for incoming message)
+		fifoName->message.data[0] = '\0';
+		mkfifo(strncat(strncat(fifoName->message.data,"resources/termIn",24),serverHash->message.data,24),DEFAULT); //Terminal -> this
+		route.terminal.in = open(fifoName->message.data,O_RDONLY);
+		
+		fifoName->message.data[0] = '\0';
+		mkfifo(strncat(strncat(fifoName->message.data,"resources/bankIn",24),serverHash->message.data,24),DEFAULT); //Interbancaire -> this
+		route.interbancaire.in = open(fifoName->message.data,O_RDONLY);
+		
+		fifoName->message.data[0] = '\0';
+		mkfifo(strncat(strncat(fifoName->message.data,"resources/authIn",24),serverHash->message.data,24),DEFAULT); //authorisation -> this
+		route.authorisation.in = open(fifoName->message.data,O_RDONLY);
+
+		// create writing file (for outgoing message)
+		fifoName->message.data[0] = '\0';
+		mkfifo(strncat(strncat(fifoName->message.data,"resources/termOut",24),serverHash->message.data,24),DEFAULT); //Terminal -> this
+		route.terminal.out = open(fifoName->message.data,O_WRONLY);
+		
+		fifoName->message.data[0] = '\0';
+		mkfifo(strncat(strncat(fifoName->message.data,"resources/bankOut",24),serverHash->message.data,24),DEFAULT); //Interbancaire -> this
+		route.interbancaire.out = open(fifoName->message.data,O_WRONLY);
+		
+		fifoName->message.data[0] = '\0';
+		mkfifo(strncat(strncat(fifoName->message.data,"resources/authOut",24),serverHash->message.data,24),DEFAULT); //authorisation -> this
+		route.authorisation.out = open(fifoName->message.data,O_WRONLY);
+
+		getchar();
+
+		
+		// delete fifo file
+		fifoName->message.data[0] = '\0';
+		unlink(strncat(strncat(fifoName->message.data,"resources/termIn",24),serverHash->message.data,24));
+		
+		fifoName->message.data[0] = '\0';
+		unlink(strncat(strncat(fifoName->message.data,"resources/bankIn",24),serverHash->message.data,24));
+		
+		fifoName->message.data[0] = '\0';
+		unlink(strncat(strncat(fifoName->message.data,"resources/authIn",24),serverHash->message.data,24));
+		
+		fifoName->message.data[0] = '\0';
+		unlink(strncat(strncat(fifoName->message.data,"resources/termOut",24),serverHash->message.data,24));
+		
+		fifoName->message.data[0] = '\0';
+		unlink(strncat(strncat(fifoName->message.data,"resources/bankOut",24),serverHash->message.data,24));
+		
+		fifoName->message.data[0] = '\0';
+		unlink(strncat(strncat(fifoName->message.data,"resources/authOut",24),serverHash->message.data,24));
 		
 		constrainedFree(serverHash);
+		constrainedFree(fifoName);
 	}else{
 		printf("usage:\n%s <bankId> "
 				 "<max memory usage>\n",argv[0]);
