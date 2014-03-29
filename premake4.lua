@@ -49,12 +49,5 @@ solution "Template"
 		files {"libCarteBancaire/alea.c",
 				 "libCarteBancaire/message.c",
 				 "libCarteBancaire/gestionFichiers.c"}
-		
-	project "test"
-		kind "ConsoleApp"
-		language "C"
-		
-		files {"src/test*.c"}
 
-		flags {"ExtraWarnings", "Symbols"}
 
