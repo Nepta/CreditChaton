@@ -25,6 +25,15 @@ solution "Template"
 		excludes{"src/test*.c"}
 		links {"libCarteBancaire"}
 
+	project "acquisition"
+		configurations {"debug", "release"}
+		kind "ConsoleApp"
+		language "C"
+
+		files {"src/acquisition.c"}
+		excludes{"src/test*.c"}
+		links {"libCarteBancaire"}
+
 	project "fileToDescriptor"
 		kind "ConsoleApp"
 		language "C"
