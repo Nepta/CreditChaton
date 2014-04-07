@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <malloc.h>
+
 #include "message.h"
 #include "alea.h"
 
@@ -30,6 +30,18 @@ int main(int argc, char **argv)
   printf("La carte bacaire est : %s\n", emeteur);
   printf("Le type du message est : %s\n", type);
   printf("La valeur est : %s\n", valeur);
+  
+  printf("\n\nMaintenant, on coupe le message pour avoir une erreur.\n");
+  msg[5] = '\0';
+  printf("message = %s\n", msg);
+  decoupeOk = decoupe(msg, emeteur, type, valeur);
+  if (!decoupeOk) {
+    printf("Erreur de découpage!!\n");
+    perror("TestMessage (decoupe)");
+    exit(0);
+  }
+
+  free(msg);
   return 0;
 }
 

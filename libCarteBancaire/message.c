@@ -1,11 +1,23 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
+
+/* Define to 1 if your system has a GNU libc compatible `malloc' function, and
+   to 0 otherwise. */
+#define HAVE_MALLOC 1
+
+/* Define to 1 if you have the <malloc.h> header file. */
+/* #undef HAVE_MALLOC_H */
+
+#if defined(HAVE_MALLOC_H)
+#include <malloc.h>
+#endif
 
 /**
  * Decoupe du message 
  * Retourne 1 si il n'y a pas eu de problème
- * Retourne 0 si il y a eu un problème
+ * Retourne 0 si il y a eu un problème - errno est mis à EINVAL dans ce cas.
  * ATTENTION:
  *   Les variables emeteur, destinataire, commande, identifiant
  *   et sms doivent être allouées avant l'appel à decoupe
@@ -20,8 +32,10 @@ int decoupe(char *message,      /* Source a découper */
 	 cb, type, valeur);
   if (nb == 3)
     return 1;
-  else 
+  else  {
+    errno = EINVAL;
     return 0;
+  }
 }
 
 /** 

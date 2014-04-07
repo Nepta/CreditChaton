@@ -48,6 +48,6 @@ solution "Template"
 		
 		files {"libCarteBancaire/alea.c",
 				 "libCarteBancaire/message.c",
-				 "libCarteBancaire/gestionFichiers.c"}
+				 "libCarteBancaire/lectureEcriture.c"}
 
 
