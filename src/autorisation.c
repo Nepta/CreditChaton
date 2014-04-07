@@ -3,6 +3,10 @@
 #include <unistd.h>
 #include <getopt.h>
 #include "../libCarteBancaire/lectureEcriture.h"
+#include "../libCarteBancaire/message.h"
+
+#define STDIN 0
+#define STDOUT 1
 
 struct option longopts[] = {
 	{"input",	required_argument, 0, 'i'},
@@ -21,9 +25,8 @@ int main(int argc, char* argv[]){
 		opterr = 0;
 		int indexptr;
 		int opt;
-		int writeFD, readFD;
+		int writeFD, readFD, bankId;
 		while((opt = getopt_long(argc, argv, "i:o:b:",longopts, &indexptr)) != -1){
-			printf("option: %c - %s\n",opt,optarg);
 			switch(opt){
 				case 'i':
 					readFD = atoi(optarg);
@@ -32,22 +35,36 @@ int main(int argc, char* argv[]){
 					writeFD = atoi(optarg);
 					break;
 				case 'b':
+					bankId = atoi(optarg);
 					break;
 				default:
 					printHelp(argv[0]);
 					break;
 			}
 		}
-/*		dup2(readFD, 0);*/
-/*		dup2(writeFD, 1);*/
-/*		close(writeFD);*/
-/*		close(readFD);*/
+		close(STDIN);
+		close(STDOUT);
+		dup2(writeFD, STDOUT);
+		dup2(readFD, STDIN);
+		close(writeFD);
+		close(readFD);
 		char* string;
-		do{}while(!(string = litLigne(readFD)));
-		ecritLigne(writeFD,string);
+		do{}while(!(string = litLigne(STDIN)));
+
+		char* cardNumber = malloc(16); cardNumber[0] = '\0';
+		char* messageType = malloc(7); messageType[0] = '\0';
+		char* value = malloc(100); value[0] = '\0';
+		printf("découpage de: %s\n",string);
+		if(decoupe(string,cardNumber,messageType,value) == 0){
+			perror("decoupeee");
+		}
+		ecritLigne(STDOUT,cardNumber);
+		int cardNumberNumber = atoi(cardNumber);
+		printf("\n%d\n%d\n%s\n",cardNumberNumber,bankId,bankId==cardNumberNumber?"i know you!":"who are you?");
 		free(string);
-		
-/*		...	*/
+		free(cardNumber);
+		free(messageType);
+		free(value);
 	}else{
 		printHelp(argv[0]);
 	}

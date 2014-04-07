@@ -48,6 +48,7 @@ int main(int argc, char* argv[]){
 		}
 	}
 	if(writeFD != -1 && readFD != -1){
+		/* construct a sane argv for the exec*/
 		argv += optind;
 		argc -= optind;
 		char* subProgram = argv[0];
