@@ -160,7 +160,10 @@ C'est 3 entités représentent 3 serveurs physique et faire moins d'exécutables
 Pour rester le plus fidèle à la réalité, chaque processus est lancé indépendemment.\\
 
 \item \textbf{Dessinez l'arbre des processus du projet.}
-%TODO
+\smallskip
+\begin{center}
+\includegraphics[scale=0.3]{fork}
+\end{center}
 
 \item \textbf{Combien de tubes sont nécessaires pour le projet ?}\\
 Pour le projet, nous avons une paire de tube par terminaux, et deux paires par banque soit, $4N+2M$ tubes.\\
@@ -171,7 +174,11 @@ Les tubes nommées (fifo) paraissent le plus approprié, pour faire communiquer 
 \item \textbf{Qui (quel processus) crée quels tubes ?}\\
 Les terminaux créent les $2M$ tubes les reliant à leurs banque respectif, et les banques les $2N$ tubes les reliants aux serveur interbancaire.\\
 
+\pagebreak
 \item \textbf{Dessinez vos processus et vos tubes.}\\
+\begin{center}
+\includegraphics[scale=0.2]{pipe}
+\end{center}
 
 \end{enumerate}
 
