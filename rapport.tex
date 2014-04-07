@@ -164,9 +164,10 @@ Pour rester le plus fidèle à la réalité, chaque processus est lancé indépe
 \begin{center}
 \includegraphics[scale=0.3]{fork}
 \end{center}
+Il n'y a pas de relation filiale entre les différents processus\\
 
 \item \textbf{Combien de tubes sont nécessaires pour le projet ?}\\
-Pour le projet, nous avons une paire de tube par terminaux, et deux paires par banque soit, $4N+2M$ tubes.\\
+Pour le projet, nous avons un tube par terminaux servant au ACK/NACK (le payement est-il autorisé) un tube par banque servant a chacun de ses terminaux de communiquer avec lui, et deux paires par banque (une paire pour la communication auth/acquisition) soit un total de $5N+M$ tubes.\\
 
 \item \textbf{Quels types de tubes allez-vous utiliser ?}
 Les tubes nommées (fifo) paraissent le plus approprié, pour faire communiquer deux processus qui n'ont pas de liens de parenté.\\
