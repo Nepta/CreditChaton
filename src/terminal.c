@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "../libCarteBancaire/gestionFichiers.h"
+#include "../libCarteBancaire/lectureEcriture.h"
 
 int main(int argc, char* argv[]){
 	if(argc == 3){

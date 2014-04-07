@@ -154,7 +154,7 @@ endif
 OBJECTS := \
 	$(OBJDIR)/alea.o \
 	$(OBJDIR)/message.o \
-	$(OBJDIR)/gestionFichiers.o \
+	$(OBJDIR)/lectureEcriture.o \
 
 RESOURCES := \
 
@@ -221,7 +221,7 @@ $(OBJDIR)/alea.o: libCarteBancaire/alea.c
 $(OBJDIR)/message.o: libCarteBancaire/message.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/gestionFichiers.o: libCarteBancaire/gestionFichiers.c
+$(OBJDIR)/lectureEcriture.o: libCarteBancaire/lectureEcriture.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 
