@@ -1,3 +1,4 @@
+# master
 gmon.out
 obj/
 exec
@@ -8,3 +9,12 @@ terminal
 fileToDescriptor
 autorisation
 acquisition
+
+
+# rapport
+*.aux
+*.log
+*.out
+*.pdf
+*.gz
+*.toc
