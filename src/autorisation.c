@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "../libCarteBancaire/lectureEcriture.h"
 #include <getopt.h>
+#include "../libCarteBancaire/lectureEcriture.h"
 
 struct option longopts[] = {
 	{"input",	required_argument, 0, 'i'},
@@ -13,6 +13,10 @@ struct option longopts[] = {
 void printHelp(const char* programName);
 
 int main(int argc, char* argv[]){
+	for(int i=0; i<argc; i++){
+		printf("%s ",argv[i]);
+	}
+	printf("\n");
 	if(argc == 7){
 		opterr = 0;
 		int indexptr;
@@ -22,22 +26,27 @@ int main(int argc, char* argv[]){
 			printf("option: %c - %s\n",opt,optarg);
 			switch(opt){
 				case 'i':
+					readFD = atoi(optarg);
 					break;
 				case 'o':
 					writeFD = atoi(optarg);
 					break;
 				case 'b':
-					readFD = atoi(optarg);
 					break;
 				default:
 					printHelp(argv[0]);
 					break;
 			}
 		}
-		dup2(readFD, 0);
-		dup2(writeFD, 1);
-		close(writeFD);
-		close(readFD);
+/*		dup2(readFD, 0);*/
+/*		dup2(writeFD, 1);*/
+/*		close(writeFD);*/
+/*		close(readFD);*/
+		char* string;
+		do{}while(!(string = litLigne(readFD)));
+		ecritLigne(writeFD,string);
+		free(string);
+		
 /*		...	*/
 	}else{
 		printHelp(argv[0]);

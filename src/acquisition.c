@@ -133,12 +133,12 @@ int main(int argc, char* argv[]){
 		printf("terminal: %s\n",string);
 		free(string);
 		
-		do{}while(!(litLigne(route.interbancaire.in)));
+		do{}while(!(string = litLigne(route.interbancaire.in)));
 		ecritLigne(route.interbancaire.out,string);
 		printf("interbancaire: %s\n",string);
 		free(string);
 		
-		do{}while(!(litLigne(route.authorisation.in)));
+		do{}while(!(string = litLigne(route.authorisation.in)));
 		ecritLigne(route.authorisation.out,string);
 		printf("authorisation: %s\n",string);
 		free(string);
