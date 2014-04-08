@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := terminal autorisation acquisition fileToDescriptor libCarteBancaire doxygen
+PROJECTS := terminal autorisation acquisition fileToDescriptor libCarteBancaire
 
 .PHONY: all clean help $(PROJECTS)
 
