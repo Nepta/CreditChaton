@@ -1,14 +1,14 @@
-Compostion du Binôme:
- - Martel Damien
- - Damien Martel
+##Compostion du Binôme:
+# - Martel Damien
+# - Damien Martel
 
-HOW TO:
-=======
-at the project source do
-$ ./fileToDescriptor -i resources/termIn.fifo -o resources/termOut.fifo -- ./terminal&
-$ ./fileToDescriptor  -o resources/termIn.fifo -i resources/termOut.fifo -- ./autorisation -b 0234567890123456&
+HOWTO:
+#=======
+#at the project source do
+	./fileToDescriptor -i resources/termIn.fifo -o resources/termOut.fifo -- ./terminal&
+	./fileToDescriptor  -o resources/termIn.fifo -i resources/termOut.fifo -- ./autorisation -b 0234567890123456&
 
-having "message in wrong format: Success" is the standard way to exit
+#having "message in wrong format: Success" is the standard way to exit
 
-you can also do
-$ make run
+#you can also do
+#$ make run
