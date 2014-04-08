@@ -44,23 +44,28 @@ int main(int argc, char* argv[]){
 					break;
 			}
 		}
-		close(STDIN);
-		close(STDOUT);
-		dup2(writeFD, STDOUT);
-		dup2(readFD, STDIN);
-		close(writeFD);
-		close(readFD);
+		char* cardNumber = malloc(16);
+		char* messageType = malloc(7);
+		char* value = malloc(100);
 		char* string;
-		do{}while(!(string = litLigne(STDIN)));
-
-		char* cardNumber = malloc(16); cardNumber[0] = '\0';
-		char* messageType = malloc(7); messageType[0] = '\0';
-		char* value = malloc(100); value[0] = '\0';
-		printf("découpage de: %s",string);
-		if(decoupe(string,cardNumber,messageType,value) == 0){
-			perror("decoupeee");
+		char ack[6];
+		char end = 0;
+		while(!end){
+			cardNumber[0] = '\0';
+			messageType[0] = '\0';
+			value[0] = '\0';
+			string = litLigne(readFD);
+			if(decoupe(string,cardNumber,messageType,value) == 0){
+				perror("message in wrong format");
+				end = 1;
+			}
+			if(strcmp(bankId,cardNumber) == 0){
+				strcpy(ack,"ACK\n");
+			}else{
+				strcpy(ack,"NACK\n");
+			}
+			ecritLigne(writeFD,ack);
 		}
-		printf("\n%s\n%s\n%s\n",cardNumber,bankId,strcmp(bankId,cardNumber)?"who are you?":"i know you!");
 		free(string);
 		free(cardNumber);
 		free(messageType);
