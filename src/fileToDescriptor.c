@@ -32,12 +32,10 @@ int main(int argc, char* argv[]){
 	while((opt = getopt_long(argc, argv, "i:o:",longopts, &indexptr)) != -1){
 		switch(opt){
 			case 'i':
-				unlink(optarg);
 				mkfifo(optarg,DEFAULT);
 				readFD = open(optarg,O_RDONLY);
 				break;
 			case 'o':
-				unlink(optarg);
 				mkfifo(optarg,DEFAULT);
 				writeFD = open(optarg,O_WRONLY);
 				break;
