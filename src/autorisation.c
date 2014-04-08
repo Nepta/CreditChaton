@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <string.h>
 #include "../libCarteBancaire/lectureEcriture.h"
 #include "../libCarteBancaire/message.h"
 
@@ -25,7 +26,8 @@ int main(int argc, char* argv[]){
 		opterr = 0;
 		int indexptr;
 		int opt;
-		int writeFD, readFD, bankId;
+		int readFD, writeFD;
+		char* bankId;
 		while((opt = getopt_long(argc, argv, "i:o:b:",longopts, &indexptr)) != -1){
 			switch(opt){
 				case 'i':
@@ -35,7 +37,7 @@ int main(int argc, char* argv[]){
 					writeFD = atoi(optarg);
 					break;
 				case 'b':
-					bankId = atoi(optarg);
+					bankId = optarg;
 					break;
 				default:
 					printHelp(argv[0]);
@@ -54,13 +56,11 @@ int main(int argc, char* argv[]){
 		char* cardNumber = malloc(16); cardNumber[0] = '\0';
 		char* messageType = malloc(7); messageType[0] = '\0';
 		char* value = malloc(100); value[0] = '\0';
-		printf("découpage de: %s\n",string);
+		printf("découpage de: %s",string);
 		if(decoupe(string,cardNumber,messageType,value) == 0){
 			perror("decoupeee");
 		}
-		ecritLigne(STDOUT,cardNumber);
-		int cardNumberNumber = atoi(cardNumber);
-		printf("\n%d\n%d\n%s\n",cardNumberNumber,bankId,bankId==cardNumberNumber?"i know you!":"who are you?");
+		printf("\n%s\n%s\n%s\n",cardNumber,bankId,strcmp(bankId,cardNumber)?"who are you?":"i know you!");
 		free(string);
 		free(cardNumber);
 		free(messageType);
