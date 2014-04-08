@@ -18,10 +18,6 @@ struct option longopts[] = {
 void printHelp(const char* programName);
 
 int main(int argc, char* argv[]){
-	for(int i=0; i<argc; i++){
-		printf("%s ",argv[i]);
-	}
-	printf("\n");
 	if(argc == 7){
 		opterr = 0;
 		int indexptr;
@@ -73,7 +69,7 @@ int main(int argc, char* argv[]){
 	}else{
 		printHelp(argv[0]);
 	}
- return argc != 7;
+ return 0;
 }
 
 void printHelp(const char* programName){
