@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <string.h>
 #include "../libCarteBancaire/lectureEcriture.h"
 #include "../libCarteBancaire/message.h"
 
@@ -31,36 +32,26 @@ int main(int argc, char* argv[]){
 					break;
 			}
 		}
-/*		char* cardNumber = malloc(16);*/
-/*		char* messageType = malloc(7);*/
-/*		char* value = malloc(100);*/
-/*		char* string;*/
-/*		char end = 0;*/
-/*		while(!end){*/
-/*			cardNumber[0] = '\0';*/
-/*			messageType[0] = '\0';*/
-/*			value[0] = '\0';*/
-/*			string = litLigne(readFD);*/
-/*			if(decoupe(string,cardNumber,messageType,value) == 0){*/
-/*				perror("message in wrong format");*/
-/*				end = 1;*/
-/*			}*/
-/*			if(strcmp(bankId,cardNumber) == 0){*/
-/*				strcpy(ack,"ACK\n");*/
-/*			}else{*/
-/*				strcpy(ack,"NACK\n");*/
-/*			}*/
-			char* msg = message("0234567890123456","Réponse","9");
+		char *msg;
+		char end = 0;
+		while(!end){
+		 	msg = malloc(30);
+		 	printf("card code:\n> ");
+		 	scanf("%16s",msg);
+		 	scanf("%*[^\n]"); // clean stdin
+			printf("->%s (r:%d,w:%d)\n",msg,readFD,writeFD);
+			msg = message(msg,"Demande","0");
+			if(strlen(msg) < strlen("|XXXXXXXXXXXXXXXX|Demande|0|\n")){ // 29
+				end = 1;
+				continue;
+			}
 			ecritLigne(writeFD,msg);
 			free(msg);
 			msg = litLigne(readFD);
-			printf("%s",msg);
+			printf("=%s",msg);
 			free(msg);
-/*		}*/
-/*		free(string);*/
-/*		free(cardNumber);*/
-/*		free(messageType);*/
-/*		free(value);*/
+		}
+		free(msg);
 	}else{
 		printHelp(argv[0]);
 	}

@@ -42,7 +42,7 @@ int main(int argc, char* argv[]){
 		}
 		char* cardNumber = malloc(16);
 		char* messageType = malloc(7);
-		char* value = malloc(100);
+		char* value = malloc(14); // only 13 digit needed for the richest of the world
 		char* string;
 		char ack[6];
 		char end = 0;
