@@ -50,4 +50,17 @@ solution "Template"
 				 "libCarteBancaire/message.c",
 				 "libCarteBancaire/lectureEcriture.c"}
 
-
+	
+	project "doxygen"
+		language "C"
+		kind "ConsoleApp"
+		buildaction "None"
+		files {"doc/Doxyfile"}		
+--	newoption{
+--		trigger     = "doxygen",
+--		description = "Build doxygen documentation",
+--		execute = function()
+--			os.execute("doxygen doc/Doxyfile")
+--		end,
+--	}
+--	

@@ -36,6 +36,10 @@ doxygen:
 	@echo "==== Building doxygen ($(config)) ===="
 	@doxygen doc/Doxyfile
 
+run:
+	@echo "==== Runing auth and terminal ===="
+	./fileToDescriptor  -o resources/termIn.fifo -i resources/termOut.fifo -- ./autorisation -b 0234567890123456&
+	./fileToDescriptor -i resources/termIn.fifo -o resources/termOut.fifo -- ./terminal
 clean:
 	@${MAKE} --no-print-directory -C . -f terminal.make clean
 	@${MAKE} --no-print-directory -C . -f autorisation.make clean
