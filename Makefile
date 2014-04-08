@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := terminal autorisation acquisition fileToDescriptor libCarteBancaire
+PROJECTS := terminal autorisation acquisition fileToDescriptor libCarteBancaire doxygen
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -32,12 +32,17 @@ libCarteBancaire:
 	@echo "==== Building libCarteBancaire ($(config)) ===="
 	@${MAKE} --no-print-directory -C . -f libCarteBancaire.make
 
+doxygen: 
+	@echo "==== Building doxygen ($(config)) ===="
+	@doxygen doc/Doxyfile
+
 clean:
 	@${MAKE} --no-print-directory -C . -f terminal.make clean
 	@${MAKE} --no-print-directory -C . -f autorisation.make clean
 	@${MAKE} --no-print-directory -C . -f acquisition.make clean
 	@${MAKE} --no-print-directory -C . -f fileToDescriptor.make clean
 	@${MAKE} --no-print-directory -C . -f libCarteBancaire.make clean
+	@${MAKE} --no-print-directory -C . -f doxygen.make clean
 
 help:
 	@echo "Usage: make [config=name] [target]"
@@ -58,5 +63,6 @@ help:
 	@echo "   acquisition"
 	@echo "   fileToDescriptor"
 	@echo "   libCarteBancaire"
+	@echo "   doxygen"
 	@echo ""
 	@echo "For more information, see http://industriousone.com/premake/quick-start"
