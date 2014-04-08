@@ -36,9 +36,9 @@ doxygen:
 	@echo "==== Building doxygen ($(config)) ===="
 	@doxygen doc/Doxyfile
 
-run:
+run: $(PROJECTS)
 	@echo "==== Runing auth and terminal ===="
-	@${MAKE} --no-print-directory -C . -f README
+	@${MAKE} --no-print-directory -C . -f run.make
 
 clean:
 	@${MAKE} --no-print-directory -C . -f terminal.make clean
@@ -68,5 +68,8 @@ help:
 	@echo "   fileToDescriptor"
 	@echo "   libCarteBancaire"
 	@echo "   doxygen"
+	@echo "   run"
+	@echo "      HOWTO"
+	@echo "      std"
 	@echo ""
 	@echo "For more information, see http://industriousone.com/premake/quick-start"
