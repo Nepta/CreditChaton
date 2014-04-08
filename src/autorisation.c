@@ -51,7 +51,7 @@ int main(int argc, char* argv[]){
 			messageType[0] = '\0';
 			value[0] = '\0';
 			string = litLigne(readFD);
-			if(decoupe(string,cardNumber,messageType,value) == 0){
+			if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
 				perror("message in wrong format");
 				end = 1;
 			}
@@ -73,9 +73,11 @@ int main(int argc, char* argv[]){
 }
 
 void printHelp(const char* programName){
-	printf(	"Usage : %s [OPTION]...\n"
+	fprintf(	stderr,
+				"Usage : %s [OPTION]...\n"
 				"  -i,--input\t file descriptor to read into (mandatory)\n"
 				"  -o,--output\t file descriptor to write into (mandatory)\n"
-				"  -b,--bank\t bank id (mandatory)\n"
-			,programName);
+				"  -b,--bank\t bank id (mandatory)\n",
+				programName
+	);
 }
