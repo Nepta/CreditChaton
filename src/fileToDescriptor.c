@@ -16,11 +16,13 @@ struct option longopts[] = {
 };
 
 void printHelp(const char* programName){
-	printf(	"Usage : %s [OPTION]... [program to execute] -- [option of the sub program]\n"
+	fprintf(	stderr,
+				"Usage : %s [OPTION]... [program to execute] -- [option of the sub program]\n"
 				"Open two fifo, and pass their file descriptor to the sub-program\n"
 				"  -i,--input\t reading fifo (mandatory)\n"
-				"  -o,--output\t writing fifo (mandatory)\n"
-			,programName);
+				"  -o,--output\t writing fifo (mandatory)\n",
+				programName
+	);
 }
 
 int main(int argc, char* argv[]){
@@ -34,10 +36,18 @@ int main(int argc, char* argv[]){
 			case 'i':
 				mkfifo(optarg,DEFAULT);
 				readFD = open(optarg,O_RDONLY);
+				if(readFD == -1){
+					perror("read");
+					exit(-1);
+				}
 				break;
 			case 'o':
 				mkfifo(optarg,DEFAULT);
 				writeFD = open(optarg,O_WRONLY);
+				if(writeFD == -1){
+					perror("write");
+					exit(-1);
+				}
 				break;
 			default:
 				printHelp(argv[0]);
@@ -45,25 +55,23 @@ int main(int argc, char* argv[]){
 				break;
 		}
 	}
-	if(writeFD != -1 && readFD != -1){
-		/* construct a sane argv for the exec*/
-		argv += optind;
-		argc -= optind;
-		char* subProgram = argv[0];
-		char** argv2 = malloc((1+4+argc)* sizeof (char*));
-		int i;
-		for(i=0;i<argc;i++){
-			argv2[i] = argv[i];
-		}
-		argv2[i] = "-i"; i++;
-		argv2[i] = malloc(3); argv2[i][0] = '\0';
-		sprintf(argv2[i],"%d",readFD); i++;
-		argv2[i] = "-o"; i++;
-		argv2[i] = malloc(3); argv2[i][0] = '\0';
-		sprintf(argv2[i],"%d",writeFD); i++;
-		argv2[i] = NULL;
-		execv(subProgram, argv2);
-		perror("exec");
+	/* construct a sane argv for the exec*/
+	argv += optind;
+	argc -= optind;
+	char* subProgram = argv[0];
+	char** argv2 = malloc((1+4+argc)* sizeof (char*));
+	int i;
+	for(i=0;i<argc;i++){
+		argv2[i] = argv[i];
 	}
+	argv2[i] = "-i"; i++;
+	argv2[i] = malloc(3); argv2[i][0] = '\0';
+	sprintf(argv2[i],"%d",readFD); i++;
+	argv2[i] = "-o"; i++;
+	argv2[i] = malloc(3); argv2[i][0] = '\0';
+	sprintf(argv2[i],"%d",writeFD); i++;
+	argv2[i] = NULL;
+	execv(subProgram, argv2);
+	perror("exec");
  return 0;
 }
