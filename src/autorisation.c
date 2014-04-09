@@ -57,7 +57,7 @@ int main(int argc, char* argv[]){
 				perror("(autorisation)message in wrong format");
 				end = 1;
 			}
-			if(strcmp(bankId,cardNumber) == 0){
+			if(strncmp(bankId,cardNumber,4) == 0){
 				sprintf(string,"|%s|Réponse|%d|\n",cardNumber,ACK);
 			}else{
 				sprintf(string,"|%s|Réponse|%d|\n",cardNumber,NACK);

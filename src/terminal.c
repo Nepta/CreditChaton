@@ -1,3 +1,6 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -32,30 +35,39 @@ int main(int argc, char* argv[]){
 					break;
 			}
 		}
-		char *msg;
+		char* msg;
+		char* string;
 		char end = 0;
 		while(!end){
-		 	msg = malloc(30);
+		 	msg = malloc(10+16+5+1); // resources/ + card code + .fifo + '\0'
 		 	printf("card code:\n> ");
 		 	scanf("%16s",msg);
 		 	scanf("%*[^\n]"); // clean stdin
-			msg = message(msg,"Demande","0");
-			if(strlen(msg) < strlen("|XXXXXXXXXXXXXXXX|Demande|0|\n")){ // 29
+/*			strcpy(msg,"0234567890123456");*/
+			string = message(msg,"Demande","0");
+			if(strlen(string) < strlen("|XXXXXXXXXXXXXXXX|Demande|0|\n")){ // 29
 				end = 1;
 				continue;
 			}
-			ecritLigne(writeFD,msg);
+			ecritLigne(writeFD,string);
+			
+			snprintf(msg,32,"resources/%.16s.fifo",string+1);
+			mkfifo(msg,0644);
+			readFD = open(msg,O_RDONLY);
+			free(string);
+			string = litLigne(readFD);
+			close(readFD);
+			unlink(msg);
 			free(msg);
-			msg = litLigne(readFD);
-			int ack = (int)(msg[27] - '0');
+			
+			int ack = (int)(string[27] - '0');
 			if(ack){
 				printf("transaction accepted\n");
 			}else{
 				printf("transaction refused\n");
 			}
-			free(msg);
+			free(string);
 		}
-		free(msg);
 	}else{
 		printHelp(argv[0]);
 	}

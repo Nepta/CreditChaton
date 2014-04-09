@@ -3,7 +3,9 @@
  * \param arg[1] bank id which this server belong
  * \param arg[2] max memory server must use
  */
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -96,7 +98,7 @@ struct option longopts[] = {
 void printHelp(const char* programName);
 
 int main(int argc, char* argv[]){
-	const char* bankId = "0234567890123456";
+	const char* bankId = "0234";
 	if(argc == 5){
 		opterr = 0;
 		int indexptr;
@@ -117,7 +119,7 @@ int main(int argc, char* argv[]){
 		}
 		char* cardNumber = malloc(16);
 		char* messageType = malloc(7);
-		char* value = malloc(14); // only 13 digit needed for the richest of the world
+		char* value = malloc(14); // only 13 digit needed for the richest man of the world
 		char* string;
 		int end = 0;
 		while(!end){
@@ -127,10 +129,27 @@ int main(int argc, char* argv[]){
 				end = 1;
 				continue;
 			}
-			if(strncmp(cardNumber,bankId,4) == 0){
-				ecritLigne(writeFD,string);
+			if(strcmp(messageType,"Demande") == 0){ //from terminal
+				if(strncmp(cardNumber,bankId,4) == 0 || 1){ // to autorisation
+					ecritLigne(writeFD,string);
+					free(string);
+				}else{ // to interbancaire
+					free(string);
+					string = malloc(30);
+					snprintf(string,30,"|%s|Demande|0|\n",cardNumber);
+					string[2] = (!(bankId[2]-'0'))+'0';
+					ecritLigne(writeFD,string);
+					free(string);
+				}
+			}else{  //from autorisation / to terminal
+				char* fifo = malloc(10+16+5+1); // resources/ + card code + .fifo + '\0' = 32
+				snprintf(fifo,32,"resources/%s.fifo",cardNumber);
+				int term = open(fifo,O_WRONLY);
+				ecritLigne(term,string);
+				close(term);
+				unlink(fifo);				
+				free(fifo);
 			}
-			free(string);
 		}
 	}else{
 		printHelp(argv[0]);
