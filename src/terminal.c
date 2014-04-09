@@ -47,7 +47,12 @@ int main(int argc, char* argv[]){
 			ecritLigne(writeFD,msg);
 			free(msg);
 			msg = litLigne(readFD);
-			printf("=%s",msg);
+			int ack = (int)(msg[27] - '0');
+			if(ack){
+				printf("transaction accepted\n");
+			}else{
+				printf("transaction refused\n");
+			}
 			free(msg);
 		}
 		free(msg);
