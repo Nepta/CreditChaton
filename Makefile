@@ -33,12 +33,12 @@ libCarteBancaire:
 	@${MAKE} --no-print-directory -C . -f libCarteBancaire.make
 
 doxygen: 
-	@echo "==== Building doxygen ($(config)) ===="
+	@echo "==== Building doxygen ===="
 	@doxygen doc/Doxyfile
 
-run: $(PROJECTS)
+run:
 	@echo "==== Runing auth and terminal ===="
-	@${MAKE} --no-print-directory -C . -f run.make
+	@${MAKE} -s --no-print-directory -C . -f run.make
 
 clean:
 	@${MAKE} --no-print-directory -C . -f terminal.make clean
