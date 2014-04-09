@@ -33,6 +33,15 @@ solution "Template"
 		files {"src/acquisition.c"}
 		excludes{"src/test*.c"}
 		links {"libCarteBancaire"}
+	
+	project "interbancaire"
+		configurations {"debug", "release"}
+		kind "ConsoleApp"
+		language "C"
+		
+		files {"src/interbancaire.c"}
+		excludes{"src/test*.c"}
+		links {"libCarteBancaire"}
 
 	project "fileToDescriptor"
 		kind "ConsoleApp"

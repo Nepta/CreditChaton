@@ -151,6 +151,50 @@ ifeq ($(config),release)
   endef
 endif
 
+ifeq ($(config),debug)
+  OBJDIR     = obj/debug/fileToDescriptor
+  TARGETDIR  = .
+  TARGET     = $(TARGETDIR)/fileToDescriptor
+  DEFINES   += 
+  INCLUDES  += 
+  CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
+  CXXFLAGS  += $(CFLAGS) 
+  LDFLAGS   += -L.
+  LIBS      += -llibCarteBancaire
+  RESFLAGS  += $(DEFINES) $(INCLUDES) 
+  LDDEPS    += liblibCarteBancaire.a
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
+
+ifeq ($(config),release)
+  OBJDIR     = obj/release/fileToDescriptor
+  TARGETDIR  = .
+  TARGET     = $(TARGETDIR)/fileToDescriptor
+  DEFINES   += 
+  INCLUDES  += 
+  CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
+  CXXFLAGS  += $(CFLAGS) 
+  LDFLAGS   += -s -L.
+  LIBS      += -llibCarteBancaire
+  RESFLAGS  += $(DEFINES) $(INCLUDES) 
+  LDDEPS    += liblibCarteBancaire.a
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
+
 OBJECTS := \
 	$(OBJDIR)/fileToDescriptor.o \
 

@@ -20,9 +20,9 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/debug/autorisation
+  OBJDIR     = obj/debug/interbancaire
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/autorisation
+  TARGET     = $(TARGETDIR)/interbancaire
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -42,9 +42,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/autorisation
+  OBJDIR     = obj/release/interbancaire
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/autorisation
+  TARGET     = $(TARGETDIR)/interbancaire
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -64,9 +64,9 @@ ifeq ($(config),release)
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/debug/autorisation
+  OBJDIR     = obj/debug/interbancaire
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/autorisation
+  TARGET     = $(TARGETDIR)/interbancaire
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -86,9 +86,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/autorisation
+  OBJDIR     = obj/release/interbancaire
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/autorisation
+  TARGET     = $(TARGETDIR)/interbancaire
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -108,9 +108,9 @@ ifeq ($(config),release)
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/debug/autorisation
+  OBJDIR     = obj/debug/interbancaire
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/autorisation
+  TARGET     = $(TARGETDIR)/interbancaire
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -130,9 +130,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/autorisation
+  OBJDIR     = obj/release/interbancaire
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/autorisation
+  TARGET     = $(TARGETDIR)/interbancaire
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -152,9 +152,9 @@ ifeq ($(config),release)
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/debug/autorisation
+  OBJDIR     = obj/debug/interbancaire
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/autorisation
+  TARGET     = $(TARGETDIR)/interbancaire
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -174,9 +174,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/autorisation
+  OBJDIR     = obj/release/interbancaire
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/autorisation
+  TARGET     = $(TARGETDIR)/interbancaire
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -196,7 +196,7 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/autorisation.o \
+	$(OBJDIR)/interbancaire.o \
 
 RESOURCES := \
 
@@ -214,7 +214,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking autorisation
+	@echo Linking interbancaire
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -235,7 +235,7 @@ else
 endif
 
 clean:
-	@echo Cleaning autorisation
+	@echo Cleaning interbancaire
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -257,7 +257,7 @@ $(GCH): $(PCH)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/autorisation.o: src/autorisation.c
+$(OBJDIR)/interbancaire.o: src/interbancaire.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 
