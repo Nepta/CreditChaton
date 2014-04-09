@@ -4,15 +4,16 @@
  * \param arg[2] max memory server must use
  */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <getopt.h>
 #include <string.h>
 #include <errno.h>
 #include "communicationThread.h"
+#include "../libCarteBancaire/lectureEcriture.h"
+#include "../libCarteBancaire/message.h"
+
 
 int maxMemory;
 static pthread_mutex_t alloc_lock;
@@ -87,87 +88,67 @@ void closeAll(Route route){
 	close(route.interbancaire.out);
 }
 
+struct option longopts[] = {
+	{"input",	required_argument, 0, 'i'},
+	{"output",	required_argument, 0, 'o'}
+};
+
+void printHelp(const char* programName);
 
 int main(int argc, char* argv[]){
-	if(argc == 3){
-		maxMemory = atoi(argv[2]);
-		int bankId = atoi(argv[1]);
-		pid_t serverId = getpid();
-		Memory *serverHash = constrainedMalloc(10);
-		Memory *fifoName = constrainedMalloc(250);
-		serverHash->message.data[0] = '\0';
-/*		snprintf(serverHash->message.data,10,"%d%d", bankId, serverId);*/
-		snprintf(serverHash->message.data,10,"%d", bankId);
-		Route route;
-		// create reading file (for incoming message)
-		fifoName->message.data[0] = '\0';
-		mkfifo(strncat(strncat(fifoName->message.data,"resources/termIn",24),serverHash->message.data,24),DEFAULT); //Terminal -> this
-		route.terminal.in = open(fifoName->message.data,O_RDONLY);
-		
-		fifoName->message.data[0] = '\0';
-		mkfifo(strncat(strncat(fifoName->message.data,"resources/bankIn",24),serverHash->message.data,24),DEFAULT); //Interbancaire -> this
-		route.interbancaire.in = open(fifoName->message.data,O_RDONLY);
-		
-		fifoName->message.data[0] = '\0';
-		mkfifo(strncat(strncat(fifoName->message.data,"resources/authIn",24),serverHash->message.data,24),DEFAULT); //authorisation -> this
-		route.authorisation.in = open(fifoName->message.data,O_RDONLY);
-
-		// create writing file (for outgoing message)
-		fifoName->message.data[0] = '\0';
-		mkfifo(strncat(strncat(fifoName->message.data,"resources/termOut",24),serverHash->message.data,24),DEFAULT); //Terminal -> this
-		route.terminal.out = open(fifoName->message.data,O_WRONLY);
-		
-		fifoName->message.data[0] = '\0';
-		mkfifo(strncat(strncat(fifoName->message.data,"resources/bankOut",24),serverHash->message.data,24),DEFAULT); //Interbancaire -> this
-		route.interbancaire.out = open(fifoName->message.data,O_WRONLY);
-		
-		fifoName->message.data[0] = '\0';
-		mkfifo(strncat(strncat(fifoName->message.data,"resources/authOut",24),serverHash->message.data,24),DEFAULT); //authorisation -> this
-		route.authorisation.out = open(fifoName->message.data,O_WRONLY);
-
-
-		// do some computation
+	const char* bankId = "0234567890123456";
+	if(argc == 5){
+		opterr = 0;
+		int indexptr;
+		int opt;
+		int readFD, writeFD;
+		while((opt = getopt_long(argc, argv, "i:o:",longopts, &indexptr)) != -1){
+			switch(opt){
+				case 'i':
+					readFD = atoi(optarg);
+					break;
+				case 'o':
+					writeFD = atoi(optarg);
+					break;
+				default:
+					printHelp(argv[0]);
+					break;
+			}
+		}
+		char* cardNumber = malloc(16);
+		char* messageType = malloc(7);
+		char* value = malloc(14); // only 13 digit needed for the richest of the world
 		char* string;
-		do{}while(!(string = litLigne(route.terminal.in)));
-		ecritLigne(route.terminal.out,string);
-		printf("terminal: %s\n",string);
-		free(string);
-		
-		do{}while(!(string = litLigne(route.interbancaire.in)));
-		ecritLigne(route.interbancaire.out,string);
-		printf("interbancaire: %s\n",string);
-		free(string);
-		
-		do{}while(!(string = litLigne(route.authorisation.in)));
-		ecritLigne(route.authorisation.out,string);
-		printf("authorisation: %s\n",string);
-		free(string);
-
-		
-		// delete fifo file
-		fifoName->message.data[0] = '\0';
-		unlink(strncat(strncat(fifoName->message.data,"resources/termIn",24),serverHash->message.data,24));
-		
-		fifoName->message.data[0] = '\0';
-		unlink(strncat(strncat(fifoName->message.data,"resources/bankIn",24),serverHash->message.data,24));
-		
-		fifoName->message.data[0] = '\0';
-		unlink(strncat(strncat(fifoName->message.data,"resources/authIn",24),serverHash->message.data,24));
-		
-		fifoName->message.data[0] = '\0';
-		unlink(strncat(strncat(fifoName->message.data,"resources/termOut",24),serverHash->message.data,24));
-		
-		fifoName->message.data[0] = '\0';
-		unlink(strncat(strncat(fifoName->message.data,"resources/bankOut",24),serverHash->message.data,24));
-		
-		fifoName->message.data[0] = '\0';
-		unlink(strncat(strncat(fifoName->message.data,"resources/authOut",24),serverHash->message.data,24));
-		
-		constrainedFree(serverHash);
-		constrainedFree(fifoName);
+		int end = 0;
+		while(!end){
+			string = litLigne(readFD);
+			fprintf(stderr,"{%s\b (r:%d,w:%d)}\n",string,readFD,writeFD);
+			if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
+				perror("message in wrong format");
+				end = 1;
+				exit(1);
+			}
+			if(strncmp(cardNumber,bankId,4) == 0){
+				fprintf(stderr,"crédit chaton card:%s:",string);
+			}else{
+				fprintf(stderr,"bénépé card:%s:",string);
+			}
+			ecritLigne(writeFD,string);
+			free(string);
+		}
 	}else{
-		printf("usage:\n%s <bankId> "
-				 "<max memory usage>\n",argv[0]);
+		printHelp(argv[0]);
 	}
- return argc == 3;
+ return 0;
 }
+
+void printHelp(const char* programName){
+	fprintf(	stderr,
+				"Usage : %s [OPTION]...\n"
+				"  -i,--input\t file descriptor to read into (mandatory)\n"
+				"  -o,--output\t file descriptor to write into (mandatory)\n",
+				programName
+	);
+}
+
+

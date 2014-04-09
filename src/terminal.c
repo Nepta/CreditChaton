@@ -39,7 +39,7 @@ int main(int argc, char* argv[]){
 		 	printf("card code:\n> ");
 		 	scanf("%16s",msg);
 		 	scanf("%*[^\n]"); // clean stdin
-			printf("->%s (r:%d,w:%d)\n",msg,readFD,writeFD);
+/*			printf("->%s (r:%d,w:%d)\n",msg,readFD,writeFD);*/
 			msg = message(msg,"Demande","0");
 			if(strlen(msg) < strlen("|XXXXXXXXXXXXXXXX|Demande|0|\n")){ // 29
 				end = 1;
