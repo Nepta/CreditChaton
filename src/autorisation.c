@@ -52,7 +52,7 @@ int main(int argc, char* argv[]){
 			value[0] = '\0';
 			string = litLigne(readFD);
 			if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
-				perror("message in wrong format");
+				perror("(autorisation)message in wrong format");
 				end = 1;
 			}
 			if(strcmp(bankId,cardNumber) == 0){

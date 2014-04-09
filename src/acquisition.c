@@ -122,18 +122,14 @@ int main(int argc, char* argv[]){
 		int end = 0;
 		while(!end){
 			string = litLigne(readFD);
-			fprintf(stderr,"{%s\b (r:%d,w:%d)}\n",string,readFD,writeFD);
 			if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
-				perror("message in wrong format");
+				perror("(acquisition)message in wrong format");
 				end = 1;
-				exit(1);
+				continue;
 			}
 			if(strncmp(cardNumber,bankId,4) == 0){
-				fprintf(stderr,"crédit chaton card:%s:",string);
-			}else{
-				fprintf(stderr,"bénépé card:%s:",string);
+				ecritLigne(writeFD,string);
 			}
-			ecritLigne(writeFD,string);
 			free(string);
 		}
 	}else{
