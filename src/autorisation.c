@@ -9,6 +9,9 @@
 #define STDIN 0
 #define STDOUT 1
 
+const int ACK = 1;
+const int NACK = 0;
+
 struct option longopts[] = {
 	{"input",	required_argument, 0, 'i'},
 	{"output",	required_argument, 0, 'o'},
@@ -44,7 +47,6 @@ int main(int argc, char* argv[]){
 		char* messageType = malloc(7);
 		char* value = malloc(14); // only 13 digit needed for the richest of the world
 		char* string;
-		char ack[6];
 		char end = 0;
 		while(!end){
 			cardNumber[0] = '\0';
@@ -56,11 +58,13 @@ int main(int argc, char* argv[]){
 				end = 1;
 			}
 			if(strcmp(bankId,cardNumber) == 0){
-				strcpy(ack,"ACK\n");
+				sprintf(string,"|%s|Réponse|%d|\n",cardNumber,ACK);
 			}else{
-				strcpy(ack,"NACK\n");
+				sprintf(string,"|%s|Réponse|%d|\n",cardNumber,NACK);
 			}
-			ecritLigne(writeFD,ack);
+
+			ecritLigne(writeFD,string);
+			free(string);
 		}
 		free(string);
 		free(cardNumber);
