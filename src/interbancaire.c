@@ -10,6 +10,7 @@
 #include "communicationThread.h"
 #include "../libCarteBancaire/lectureEcriture.h"
 #include "../libCarteBancaire/message.h"
+#include "annuaire.h"
 
 static int bank[10000];
 int searchBank(char bankId[5]);
