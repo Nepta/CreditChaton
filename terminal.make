@@ -195,6 +195,50 @@ ifeq ($(config),release)
   endef
 endif
 
+ifeq ($(config),release)
+  OBJDIR     = obj/release/terminal
+  TARGETDIR  = .
+  TARGET     = $(TARGETDIR)/terminal
+  DEFINES   += 
+  INCLUDES  += 
+  CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
+  CXXFLAGS  += $(CFLAGS) 
+  LDFLAGS   += -s -L.
+  LIBS      += -llibCarteBancaire
+  RESFLAGS  += $(DEFINES) $(INCLUDES) 
+  LDDEPS    += liblibCarteBancaire.a
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
+
+ifeq ($(config),release)
+  OBJDIR     = obj/release/terminal
+  TARGETDIR  = .
+  TARGET     = $(TARGETDIR)/terminal
+  DEFINES   += 
+  INCLUDES  += 
+  CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
+  CXXFLAGS  += $(CFLAGS) 
+  LDFLAGS   += -s -L.
+  LIBS      += -llibCarteBancaire
+  RESFLAGS  += $(DEFINES) $(INCLUDES) 
+  LDDEPS    += liblibCarteBancaire.a
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
+
 OBJECTS := \
 	$(OBJDIR)/terminal.o \
 

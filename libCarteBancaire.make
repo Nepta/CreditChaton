@@ -195,6 +195,50 @@ ifeq ($(config),release)
   endef
 endif
 
+ifeq ($(config),release)
+  OBJDIR     = obj/release/libCarteBancaire
+  TARGETDIR  = .
+  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  DEFINES   += 
+  INCLUDES  += 
+  CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
+  CXXFLAGS  += $(CFLAGS) 
+  LDFLAGS   += -s
+  LIBS      += 
+  RESFLAGS  += $(DEFINES) $(INCLUDES) 
+  LDDEPS    += 
+  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
+
+ifeq ($(config),release)
+  OBJDIR     = obj/release/libCarteBancaire
+  TARGETDIR  = .
+  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  DEFINES   += 
+  INCLUDES  += 
+  CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
+  CXXFLAGS  += $(CFLAGS) 
+  LDFLAGS   += -s
+  LIBS      += 
+  RESFLAGS  += $(DEFINES) $(INCLUDES) 
+  LDDEPS    += 
+  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
+
 OBJECTS := \
 	$(OBJDIR)/alea.o \
 	$(OBJDIR)/message.o \

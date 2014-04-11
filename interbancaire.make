@@ -29,9 +29,9 @@ ifeq ($(config),debug)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L.
-  LIBS      += -llibCarteBancaire
+  LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += liblibCarteBancaire.a
+  LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
@@ -51,9 +51,9 @@ ifeq ($(config),release)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s -L.
-  LIBS      += -llibCarteBancaire
+  LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += liblibCarteBancaire.a
+  LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
@@ -73,9 +73,9 @@ ifeq ($(config),debug)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L.
-  LIBS      += -llibCarteBancaire
+  LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += liblibCarteBancaire.a
+  LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
@@ -95,9 +95,9 @@ ifeq ($(config),release)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s -L.
-  LIBS      += -llibCarteBancaire
+  LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += liblibCarteBancaire.a
+  LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
@@ -117,9 +117,9 @@ ifeq ($(config),debug)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L.
-  LIBS      += -llibCarteBancaire
+  LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += liblibCarteBancaire.a
+  LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
@@ -139,9 +139,9 @@ ifeq ($(config),release)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s -L.
-  LIBS      += -llibCarteBancaire
+  LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += liblibCarteBancaire.a
+  LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
@@ -161,9 +161,9 @@ ifeq ($(config),debug)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -L.
-  LIBS      += -llibCarteBancaire
+  LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += liblibCarteBancaire.a
+  LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
@@ -183,9 +183,53 @@ ifeq ($(config),release)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s -L.
-  LIBS      += -llibCarteBancaire
+  LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
-  LDDEPS    += liblibCarteBancaire.a
+  LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
+
+ifeq ($(config),release)
+  OBJDIR     = obj/release/interbancaire
+  TARGETDIR  = .
+  TARGET     = $(TARGETDIR)/interbancaire
+  DEFINES   += 
+  INCLUDES  += 
+  CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
+  CXXFLAGS  += $(CFLAGS) 
+  LDFLAGS   += -s -L.
+  LIBS      += -llibCarteBancaire -llibAnnuaire
+  RESFLAGS  += $(DEFINES) $(INCLUDES) 
+  LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
+
+ifeq ($(config),release)
+  OBJDIR     = obj/release/interbancaire
+  TARGETDIR  = .
+  TARGET     = $(TARGETDIR)/interbancaire
+  DEFINES   += 
+  INCLUDES  += 
+  CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
+  CXXFLAGS  += $(CFLAGS) 
+  LDFLAGS   += -s -L.
+  LIBS      += -llibCarteBancaire -llibAnnuaire
+  RESFLAGS  += $(DEFINES) $(INCLUDES) 
+  LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef

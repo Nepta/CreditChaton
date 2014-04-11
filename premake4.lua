@@ -23,7 +23,7 @@ solution "Template"
 
 		files {"src/autorisation.c"}
 		excludes{"src/test*.c"}
-		links {"libCarteBancaire"}
+		links {"libCarteBancaire","libAnnuaire"}
 
 	project "acquisition"
 		configurations {"debug", "release"}
@@ -41,7 +41,7 @@ solution "Template"
 		
 		files {"src/interbancaire.c"}
 		excludes{"src/test*.c"}
-		links {"libCarteBancaire"}
+		links {"libCarteBancaire","libAnnuaire"}
 
 	project "fileToDescriptor"
 		kind "ConsoleApp"
@@ -51,6 +51,7 @@ solution "Template"
 		links {"libCarteBancaire"}
 
 	project "libCarteBancaire"
+		configurations {"release"}
 		kind "StaticLib"
 		language "C"
 		flags {"OptimizeSpeed"}
@@ -59,17 +60,10 @@ solution "Template"
 				 "libCarteBancaire/message.c",
 				 "libCarteBancaire/lectureEcriture.c"}
 
-	
-	project "doxygen"
+	project "libAnnuaire"
+		configurations {"release"}
+		kind "StaticLib"
 		language "C"
-		kind "ConsoleApp"
-		buildaction "None"
-		files {"doc/Doxyfile"}		
---	newoption{
---		trigger     = "doxygen",
---		description = "Build doxygen documentation",
---		execute = function()
---			os.execute("doxygen doc/Doxyfile")
---		end,
---	}
---	
+		flags {"OptimizeSpeed"}
+		files {"src/annuaire.c"}
+	

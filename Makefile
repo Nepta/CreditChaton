@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := terminal autorisation acquisition interbancaire fileToDescriptor libCarteBancaire
+PROJECTS := terminal autorisation acquisition interbancaire fileToDescriptor libCarteBancaire libAnnuaire
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -16,7 +16,7 @@ terminal: libCarteBancaire
 	@echo "==== Building terminal ($(config)) ===="
 	@${MAKE} --no-print-directory -C . -f terminal.make
 
-autorisation: libCarteBancaire
+autorisation: libCarteBancaire libAnnuaire
 	@echo "==== Building autorisation ($(config)) ===="
 	@${MAKE} --no-print-directory -C . -f autorisation.make
 
@@ -24,7 +24,7 @@ acquisition: libCarteBancaire
 	@echo "==== Building acquisition ($(config)) ===="
 	@${MAKE} --no-print-directory -C . -f acquisition.make
 
-interbancaire: libCarteBancaire
+interbancaire: libCarteBancaire libAnnuaire
 	@echo "==== Building interbancaire ($(config)) ===="
 	@${MAKE} --no-print-directory -C . -f interbancaire.make
 
@@ -36,6 +36,10 @@ libCarteBancaire:
 	@echo "==== Building libCarteBancaire ($(config)) ===="
 	@${MAKE} --no-print-directory -C . -f libCarteBancaire.make
 
+libAnnuaire: 
+	@echo "==== Building libAnnuaire ($(config)) ===="
+	@${MAKE} --no-print-directory -C . -f libAnnuaire.make
+	
 doxygen: 
 	@echo "==== Building doxygen ===="
 	@doxygen doc/Doxyfile
@@ -51,7 +55,7 @@ clean:
 	@${MAKE} --no-print-directory -C . -f interbancaire.make clean
 	@${MAKE} --no-print-directory -C . -f fileToDescriptor.make clean
 	@${MAKE} --no-print-directory -C . -f libCarteBancaire.make clean
-	@${MAKE} --no-print-directory -C . -f doxygen.make clean
+	@${MAKE} --no-print-directory -C . -f libAnnuaire.make clean
 
 help:
 	@echo "Usage: make [config=name] [target]"
@@ -65,6 +69,8 @@ help:
 	@echo "   release"
 	@echo "   debug"
 	@echo "   release"
+	@echo "   release"
+	@echo "   release"
 	@echo ""
 	@echo "TARGETS:"
 	@echo "   all (default)"
@@ -75,6 +81,7 @@ help:
 	@echo "   interbancaire"
 	@echo "   fileToDescriptor"
 	@echo "   libCarteBancaire"
+	@echo "   libAnnuaire"
 	@echo "   doxygen"
 	@echo "   run"
 	@echo ""
