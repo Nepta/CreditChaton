@@ -47,7 +47,7 @@ int main(int argc, char* argv[]){
 		char* cardNumber = malloc(16);
 		char* messageType = malloc(7);
 		char* value = malloc(14); // only 13 digit needed for the richest of the world
-		DirectoryService *data = load(0);
+		DirectoryService *data = load("resources/annuaire.txt");
 		char* string;
 		char end = 0;
 		while(!end){

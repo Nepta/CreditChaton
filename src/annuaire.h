@@ -9,7 +9,7 @@ typedef struct{
 }DirectoryService;
 
 int exist(DirectoryService *data, char id[16]);
-DirectoryService* load(int fd);
+DirectoryService* load(char*);
 
 #endif /* __ANNUAIRE_H__ */
 
