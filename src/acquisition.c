@@ -141,7 +141,6 @@ int main(int argc, char* argv[]){
 				if(strncmp(cardNumber,bankId,4) == 0){ // to autorisation
 					ecritLigne(writeFD,string);
 				}else{ // to interbancaire
-					fprintf(stderr,"sending to interbancaire\n");
 					ecritLigne(interbancaire,string);
 				}
 			}else{  //from autorisation / to terminal
