@@ -59,7 +59,6 @@ int main(int argc, char* argv[]){
 				perror("(autorisation)message in wrong format");
 				end = 1;
 			}
-			fprintf(stderr,"auth:(%d) %s\n",exist(data,cardNumber),cardNumber);
 			if(exist(data,cardNumber)){
 				sprintf(string,"|%s|Réponse|%d|\n",cardNumber,ACK);
 			}else{

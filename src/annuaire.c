@@ -4,7 +4,7 @@
 int exist(DirectoryService *data, char id[16]){
 	int isIdExisting = 0;
 	for(int i=0; i<data->size; i++){
-		if(strncmp(data->base[i],id,16)){
+		if(strncmp(data->base[i],id,16) == 0){
 			isIdExisting = 1;
 			break;
 		}
