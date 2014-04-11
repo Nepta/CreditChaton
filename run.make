@@ -4,10 +4,19 @@ endif
 
 ifeq ($(example),default)
 default: cleanFifo
+	@./interbancaire &
 	@./fileToDescriptor -i resources/acquisition.fifo -o resources/autorisation.fifo -- ./acquisition &
 	@./fileToDescriptor  -o resources/acquisition.fifo -i resources/autorisation.fifo -- ./autorisation -b 0234567890123456 &
 	@./fileToDescriptor -i resources/autorisation.fifo -o resources/acquisition.fifo -- ./terminal
 endif
+
+ifeq ($(example),ata)
+ata: cleanFifo
+	@./fileToDescriptor -i resources/acquisition.fifo -o resources/autorisation.fifo -- ./acquisition &
+	@./fileToDescriptor  -o resources/acquisition.fifo -i resources/autorisation.fifo -- ./autorisation -b 0234567890123456 &
+	@./fileToDescriptor -i resources/autorisation.fifo -o resources/acquisition.fifo -- ./terminal
+endif
+
 
 ifeq ($(example),std)
 std: cleanFifo

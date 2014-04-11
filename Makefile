@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := terminal autorisation acquisition fileToDescriptor libCarteBancaire
+PROJECTS := terminal autorisation acquisition interbancaire fileToDescriptor libCarteBancaire
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -23,6 +23,10 @@ autorisation: libCarteBancaire
 acquisition: libCarteBancaire
 	@echo "==== Building acquisition ($(config)) ===="
 	@${MAKE} --no-print-directory -C . -f acquisition.make
+
+interbancaire: libCarteBancaire
+	@echo "==== Building interbancaire ($(config)) ===="
+	@${MAKE} --no-print-directory -C . -f interbancaire.make
 
 fileToDescriptor: libCarteBancaire
 	@echo "==== Building fileToDescriptor ($(config)) ===="
@@ -44,6 +48,7 @@ clean:
 	@${MAKE} --no-print-directory -C . -f terminal.make clean
 	@${MAKE} --no-print-directory -C . -f autorisation.make clean
 	@${MAKE} --no-print-directory -C . -f acquisition.make clean
+	@${MAKE} --no-print-directory -C . -f interbancaire.make clean
 	@${MAKE} --no-print-directory -C . -f fileToDescriptor.make clean
 	@${MAKE} --no-print-directory -C . -f libCarteBancaire.make clean
 	@${MAKE} --no-print-directory -C . -f doxygen.make clean
@@ -58,6 +63,8 @@ help:
 	@echo "   release"
 	@echo "   debug"
 	@echo "   release"
+	@echo "   debug"
+	@echo "   release"
 	@echo ""
 	@echo "TARGETS:"
 	@echo "   all (default)"
@@ -65,11 +72,10 @@ help:
 	@echo "   terminal"
 	@echo "   autorisation"
 	@echo "   acquisition"
+	@echo "   interbancaire"
 	@echo "   fileToDescriptor"
 	@echo "   libCarteBancaire"
 	@echo "   doxygen"
 	@echo "   run"
-	@echo "      HOWTO"
-	@echo "      std"
 	@echo ""
 	@echo "For more information, see http://industriousone.com/premake/quick-start"
