@@ -122,6 +122,14 @@ int main(int argc, char* argv[]){
 		char* value = malloc(14); // only 13 digit needed for the richest man of the world
 		char* string;
 		int end = 0;
+
+		char bankFifo[10+4+4+1]; // "resources/" + "bank" + bankId + '\0'
+		strncpy(bankFifo,"resources/bank",14);
+		strncat(bankFifo,bankId,4);
+		mkfifo("resources/interbancaire",0644);
+		int interbancaire = open("resources/interbancaire",O_WRONLY);
+		int interReadFD = open(bankFifo,O_RDONLY);
+		mkfifo(bankFifo,0644);
 		while(!end){
 			string = litLigne(readFD);
 			if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
@@ -130,26 +138,21 @@ int main(int argc, char* argv[]){
 				continue;
 			}
 			if(strcmp(messageType,"Demande") == 0){ //from terminal
-				if(strncmp(cardNumber,bankId,4) == 0 || 1){ // to autorisation
+				if(strncmp(cardNumber,bankId,4) == 0){ // to autorisation
 					ecritLigne(writeFD,string);
-					free(string);
 				}else{ // to interbancaire
-					free(string);
-					string = malloc(30);
-					snprintf(string,30,"|%s|Demande|0|\n",cardNumber);
-					string[2] = (!(bankId[2]-'0'))+'0';
-					ecritLigne(writeFD,string);
-					free(string);
+					fprintf(stderr,"sending to interbancaire\n");
+					ecritLigne(interbancaire,string);
 				}
 			}else{  //from autorisation / to terminal
 				char* fifo = malloc(10+16+5+1); // resources/ + card code + .fifo + '\0' = 32
 				snprintf(fifo,32,"resources/%s.fifo",cardNumber);
 				int term = open(fifo,O_WRONLY);
+				free(fifo);
 				ecritLigne(term,string);
 				close(term);
-				unlink(fifo);				
-				free(fifo);
 			}
+			free(string);
 		}
 	}else{
 		printHelp(argv[0]);
