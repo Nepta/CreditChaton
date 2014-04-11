@@ -28,7 +28,7 @@ ifeq ($(config),debug)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -L.
+  LDFLAGS   += -pthread -L.
   LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
@@ -50,7 +50,7 @@ ifeq ($(config),release)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -s -L.
+  LDFLAGS   += -s -pthread -L.
   LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
@@ -72,7 +72,7 @@ ifeq ($(config),debug)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -L.
+  LDFLAGS   += -pthread -L.
   LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
@@ -94,7 +94,7 @@ ifeq ($(config),release)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -s -L.
+  LDFLAGS   += -s -pthread -L.
   LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
@@ -116,7 +116,7 @@ ifeq ($(config),debug)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -L.
+  LDFLAGS   += -pthread -L.
   LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
@@ -138,7 +138,7 @@ ifeq ($(config),release)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -s -L.
+  LDFLAGS   += -s -pthread -L.
   LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
@@ -160,7 +160,7 @@ ifeq ($(config),debug)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -L.
+  LDFLAGS   += -pthread -L.
   LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
@@ -182,7 +182,7 @@ ifeq ($(config),release)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -s -L.
+  LDFLAGS   += -s -pthread -L.
   LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
@@ -204,7 +204,7 @@ ifeq ($(config),release)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -s -L.
+  LDFLAGS   += -s -pthread -L.
   LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
@@ -226,7 +226,7 @@ ifeq ($(config),release)
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -s -L.
+  LDFLAGS   += -s -pthread -L.
   LIBS      += -llibCarteBancaire -llibAnnuaire
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a

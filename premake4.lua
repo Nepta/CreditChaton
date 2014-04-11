@@ -1,5 +1,6 @@
 solution "Template"
 	buildoptions{"-std=c99"}
+	linkoptions{"-pthread"}
 	flags {"Unicode"}
 
 	configuration "release"
@@ -21,7 +22,7 @@ solution "Template"
 		kind "ConsoleApp"
 		language "C"
 
-		files {"src/autorisation.c"}
+		files {"src/autorisation.c","src/communicationThread.c"}
 		excludes{"src/test*.c"}
 		links {"libCarteBancaire","libAnnuaire"}
 

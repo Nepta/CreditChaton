@@ -39,7 +39,7 @@ libCarteBancaire:
 libAnnuaire: 
 	@echo "==== Building libAnnuaire ($(config)) ===="
 	@${MAKE} --no-print-directory -C . -f libAnnuaire.make
-	
+
 doxygen: 
 	@echo "==== Building doxygen ===="
 	@doxygen doc/Doxyfile
