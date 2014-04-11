@@ -127,11 +127,12 @@ int main(int argc, char* argv[]){
 		char* string;
 		int end = 0;
 
-		char bankFifo[10+4+4+1]; // "resources/" + "bank" + bankId + '\0'
+		char bankFifo[10+4+4+5+1]; // "resources/" + "bank" + bankId + .fifo + '\0'
 		strncpy(bankFifo,"resources/bank",14);
 		strncat(bankFifo,bankId,4);
-		mkfifo("resources/interbancaire",0644);
-		int interbancaire = open("resources/interbancaire",O_WRONLY);
+		strncat(bankFifo,".fifo",5);
+		mkfifo("resources/interbancaire.fifo",0644);
+		int interbancaire = open("resources/interbancaire.fifo",O_WRONLY);
 		int interReadFD = open(bankFifo,O_RDONLY);
 		mkfifo(bankFifo,0644);
 		while(!end){

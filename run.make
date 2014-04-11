@@ -31,5 +31,5 @@ authonly: cleanFifo
 endif
 
 cleanFifo:
-	@rm resources/*
+	@rm resources/*.fifo || true
 

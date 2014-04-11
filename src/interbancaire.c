@@ -18,9 +18,9 @@ void* connection(int pipe[2]);
 
 int main(int argc, char* argv[]){
 	int interbancaire[2];
-	mkfifo("resources/interbancaire",0644);
+	mkfifo("resources/interbancaire.fifo",0644);
 /*	mkfifo("resources/bank0234",0644);*/
-	interbancaire[READ] = open("resources/interbancaire",O_RDONLY);
+	interbancaire[READ] = open("resources/interbancaire.fifo",O_RDONLY);
 /*	bank[1234] = open("resources/bank0234",O_WRONLY);*/
 	interbancaire[WRITE] = open("resources/acquisition.fifo",O_WRONLY);
 	void* end = 0;
