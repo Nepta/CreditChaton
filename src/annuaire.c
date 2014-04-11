@@ -29,3 +29,14 @@ DirectoryService* load(int fd){
  return data;
 }
 
+// recuperé du tower defense: https://github.com/Nepta/Tower-Defense/blob/master/jsonParser.c#L37
+char* fileToString(FILE *file){
+	fseek(file, 0, SEEK_END);
+	int fileSize = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	char *string = calloc(fileSize,1);
+	fread(string, 1, fileSize+1, file);
+ return string;
+}
+
+
