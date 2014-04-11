@@ -92,25 +92,29 @@ void closeAll(Route route){
 
 struct option longopts[] = {
 	{"input",	required_argument, 0, 'i'},
-	{"output",	required_argument, 0, 'o'}
+	{"output",	required_argument, 0, 'o'},
+	{"bank",		required_argument, 0, 'b'}
 };
 
 void printHelp(const char* programName);
 
 int main(int argc, char* argv[]){
-	const char* bankId = "0234";
-	if(argc == 5){
+	if(argc == 7){
 		opterr = 0;
 		int indexptr;
 		int opt;
 		int readFD, writeFD;
-		while((opt = getopt_long(argc, argv, "i:o:",longopts, &indexptr)) != -1){
+		char* bankId;
+		while((opt = getopt_long(argc, argv, "i:o:b:",longopts, &indexptr)) != -1){
 			switch(opt){
 				case 'i':
 					readFD = atoi(optarg);
 					break;
 				case 'o':
 					writeFD = atoi(optarg);
+					break;
+				case 'b':
+					bankId = optarg;
 					break;
 				default:
 					printHelp(argv[0]);
@@ -163,7 +167,8 @@ void printHelp(const char* programName){
 	fprintf(	stderr,
 				"Usage : %s [OPTION]...\n"
 				"  -i,--input\t file descriptor to read into (mandatory)\n"
-				"  -o,--output\t file descriptor to write into (mandatory)\n",
+				"  -o,--output\t file descriptor to write into (mandatory)\n"
+				"  -b,--bank\t bank id (mandatory)\n",
 				programName
 	);
 }
