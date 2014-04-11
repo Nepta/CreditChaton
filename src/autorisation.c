@@ -5,6 +5,7 @@
 #include <string.h>
 #include "../libCarteBancaire/lectureEcriture.h"
 #include "../libCarteBancaire/message.h"
+#include "annuaire.h"
 
 #define STDIN 0
 #define STDOUT 1
@@ -46,6 +47,7 @@ int main(int argc, char* argv[]){
 		char* cardNumber = malloc(16);
 		char* messageType = malloc(7);
 		char* value = malloc(14); // only 13 digit needed for the richest of the world
+		DirectoryService *data = load(0);
 		char* string;
 		char end = 0;
 		while(!end){
@@ -57,12 +59,13 @@ int main(int argc, char* argv[]){
 				perror("(autorisation)message in wrong format");
 				end = 1;
 			}
-			if(strncmp(bankId,cardNumber,4) == 0){
+			fprintf(stderr,"auth:(%d) %s\n",exist(data,cardNumber),cardNumber);
+			if(exist(data,cardNumber)){
 				sprintf(string,"|%s|Réponse|%d|\n",cardNumber,ACK);
 			}else{
 				sprintf(string,"|%s|Réponse|%d|\n",cardNumber,NACK);
 			}
-
+			
 			ecritLigne(writeFD,string);
 			free(string);
 		}
