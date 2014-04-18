@@ -53,7 +53,7 @@ int main(int argc, char* argv[]){
 			string = message(account,"Demande","0");
 			ecritLigne(bank,string);
 			
-			snprintf(responseFifo,32,"resources/bank%.4s/%.16s.fifo",bankId,account);
+			sprintf(responseFifo,"resources/bank%.4s/%.16s.fifo",bankId,account);
 			mkfifo(responseFifo,DEFAULT);
 			int response = open(responseFifo,O_RDONLY);
 			free(string);

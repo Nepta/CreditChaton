@@ -32,21 +32,25 @@ void* remoteAuth();
 static int threadPoolPipe[2];
 
 int main(int argc, char* argv[]){
-	int bankList[] = {0000,0001};
+	char* bankList[] = {"0000","0001"};
 	int bankListSize = 2;
 	int poolSize = 9;
 	pipe(threadPoolPipe);
+
 	
 	pthread_t threadId[bankListSize];
-	
 	for(int i=0; i<bankListSize; i++){
+		char bankPath[20] = {0};
+		sprintf(bankPath,"resources/bank%.4s",bankList[i]);
+		mkdir(bankPath,0755);
 		char fifoPath[64] = {0};
 		int *remotePipe = malloc(2*sizeof (int));
-		sprintf(fifoPath,"resources/interRemoteDemande%.4d.fifo",bankList[i]);
+		
+		sprintf(fifoPath,"%s/interRemoteDemande.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe[READ] = open(fifoPath,O_RDONLY);
 	
-		sprintf(fifoPath,"resources/réponse%.4d.fifo",bankList[i]);
+		sprintf(fifoPath,"%s/réponse.fifo",bankList[i]);
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe[WRITE] = open(fifoPath,O_WRONLY);
 		threadId[i] = createThread(connection,remotePipe);
@@ -85,12 +89,16 @@ void* connection(int associatedBank[2]){
 		ConnectionPipe *remotePipe = malloc(sizeof (ConnectionPipe));
 		remotePipe->bankResponse = associatedBank[WRITE];
 	
+		char bankPath[20] = {0};
+		sprintf(bankPath,"resources/bank%.4s",cardNumber+1);
+		mkdir(bankPath,0755);
+
 		char fifoPath[64] = {0};
-		sprintf(fifoPath,"resources/interDemande%.4s.fifo",cardNumber+1);
+		sprintf(fifoPath,"%s/interDemande.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe->interDemand = open(fifoPath,O_WRONLY);
 	
-		sprintf(fifoPath,"resources/interRéponse%.4s.fifo",cardNumber+1);
+		sprintf(fifoPath,"%s/interRéponse.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe->interResponse = open(fifoPath,O_WRONLY);
 		RemoteAuthData *data = malloc(sizeof (RemoteAuthData));

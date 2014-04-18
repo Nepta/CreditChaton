@@ -107,7 +107,7 @@ int main(int argc, char* argv[]){
 				}
 			}else{  //from autorisation / to terminal
 				char fifo[64] = {0}; // resources/ + card code + .fifo + '\0' = 32
-				sprintf(fifo,"resources/%.4s/%s.fifo",bankId,cardNumber);
+				sprintf(fifo,"%s/%s.fifo",bankPath,cardNumber);
 				int term = open(fifo,O_WRONLY);
 				ecritLigne(term,string);
 				close(term);

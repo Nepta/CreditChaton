@@ -118,7 +118,6 @@ void* authenticate(void* pipe_){
 		}else{
 			sprintf(string,"|%s|Réponse|%d|\n",cardNumber,NACK);
 		}
-		
 		ecritLigne(pipe[WRITE],string);
 		free(string);
 	}
