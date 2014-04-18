@@ -18,8 +18,7 @@
 
 typedef struct{
 	int authDemand;
-	int authResponse;
-	int interDemand;
+	int input;
 	int interResponse;
 }RemotePipe;
 
@@ -109,17 +108,12 @@ void* routeRemoteRequest(char* bankPath){
 	RemotePipe remote;
 
 	sprintf(remoteFifo,"%s/remoteAuthDemande.fifo",bankPath);
-	errno = 0;
 	mkfifo(remoteFifo,DEFAULT);
 	remote.authDemand = open(remoteFifo,O_WRONLY);
 
-	sprintf(remoteFifo,"%s/remoteAuthRéponse.fifo",bankPath);
+	sprintf(remoteFifo,"%s/remoteInput.fifo",bankPath);
 	mkfifo(remoteFifo,DEFAULT);
-	remote.authResponse = open(remoteFifo,O_RDONLY);
-
-	sprintf(remoteFifo,"%s/interDemande.fifo",bankPath);
-	mkfifo(remoteFifo,DEFAULT);
-	remote.interDemand = open(remoteFifo,O_RDONLY);
+	remote.input = open(remoteFifo,O_RDONLY);
 
 	sprintf(remoteFifo,"%s/interRéponse.fifo",bankPath);
 	mkfifo(remoteFifo,DEFAULT);
@@ -131,22 +125,17 @@ void* routeRemoteRequest(char* bankPath){
 	char* string;
 	int end = 0;
 	while(!end){
-		string = litLigne(remote.interDemand);
+		string = litLigne(remote.input);
 		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
 			perror("(remote acquisition) message in wrong format");
 			end = 1;
 			continue;
 		}
-		ecritLigne(remote.authDemand,string);
-		free(string);
-		
-		string = litLigne(remote.authResponse);
-		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
-			perror("(remote acquisition) message in wrong format");
-			end = 1;
-			continue;
+		if(strcmp(messageType,"Demande") == 0){
+			ecritLigne(remote.authDemand,string);
+		}else{
+			ecritLigne(remote.interResponse,string);
 		}
-		ecritLigne(remote.interResponse,string);
 		free(string);
 	}
  return NULL;

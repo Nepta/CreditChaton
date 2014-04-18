@@ -94,7 +94,7 @@ void* connection(int *associatedBank_){
 		sprintf(bankPath,"resources/bank%.4s",cardNumber);
 		mkdir(bankPath,0755);
 		char fifoPath[64] = {0};
-		sprintf(fifoPath,"%s/interDemande.fifo",bankPath);
+		sprintf(fifoPath,"%s/remoteInput.fifo",bankPath);
 
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe->interDemand = open(fifoPath,O_WRONLY);

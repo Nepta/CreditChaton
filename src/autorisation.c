@@ -61,7 +61,7 @@ int main(int argc, char* argv[]){
 		mkfifo(pipeName,DEFAULT);
 		int remoteDemand = open(pipeName,O_RDONLY);
 		
-		sprintf(pipeName,"%s/remoteAuthRéponse.fifo",bankPath);
+		sprintf(pipeName,"%s/remoteInput.fifo",bankPath);
 		mkfifo(pipeName,DEFAULT);
 		int remoteResponse = open(pipeName,O_WRONLY);
 		
