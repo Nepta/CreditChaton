@@ -16,103 +16,28 @@
 #include "../libCarteBancaire/lectureEcriture.h"
 #include "../libCarteBancaire/message.h"
 
-
-int maxMemory;
-static pthread_mutex_t alloc_lock;
-
-struct charMemory{
-	unsigned char size;
-	char* data[];
-};
-
-struct generalMemory{
-	unsigned char size;
-	void* data[];
-};
-
-typedef union{
-	struct charMemory message;
-	struct generalMemory generic;
-}Memory;
-
-
 typedef struct{
-	int in;
-	int out;
-}Direction;
-
-typedef struct{
-	Direction terminal;
-	Direction authorisation;
-	Direction interbancaire;
-}Route;
-
-/**
- * try to allocate memory respecting the maximum memory the server must use
- * \param size size of memory we want to allocate
- * \return a pointer to the allocated memory or NULL if no more memory is available
- */
-
-Memory* constrainedMalloc(size_t size){
-	pthread_mutex_lock(&alloc_lock);
-	if((int)(maxMemory - (size + sizeof (Memory))) > 0){
-		maxMemory -= size + sizeof (Memory);
-		Memory *memory = malloc(size + sizeof (Memory));
-		memory->generic.size = size;
-		pthread_mutex_unlock(&alloc_lock);
-		return memory;
-	}else{
-		pthread_mutex_unlock(&alloc_lock);
-		errno = ENOMEM;
-		perror("no memory left");
-		return NULL;
-	}
-}
-
-/**
- * unallocated memory and tell it to others part of process
- * \param memory a Memory to unallocate
- */
-
-void constrainedFree(Memory* memory){
-	maxMemory += memory->generic.size + sizeof (Memory);
-	free(memory);
-}
+	int auth;
+	int router;
+	int inter;
+}RemotePipe;
 
 const int DEFAULT = 0644;
-
-void closeAll(Route route){
-	close(route.terminal.in);
-	close(route.terminal.out);
-	close(route.authorisation.in);
-	close(route.authorisation.out);
-	close(route.interbancaire.in);
-	close(route.interbancaire.out);
-}
-
 struct option longopts[] = {
-	{"input",	required_argument, 0, 'i'},
-	{"output",	required_argument, 0, 'o'},
-	{"bank",		required_argument, 0, 'b'}
+	{"bank",	required_argument, 0, 'b'}
 };
 
 void printHelp(const char* programName);
+void* routeRemoteRequest(void* pipe);
 
 int main(int argc, char* argv[]){
-	if(argc == 7){
+	if(argc == 3){
 		opterr = 0;
 		int indexptr;
 		int opt;
-		int readFD, writeFD;
 		char* bankId;
-		while((opt = getopt_long(argc, argv, "i:o:b:",longopts, &indexptr)) != -1){
+		while((opt = getopt_long(argc, argv, "b:",longopts, &indexptr)) != -1){
 			switch(opt){
-				case 'i':
-					readFD = atoi(optarg);
-					break;
-				case 'o':
-					writeFD = atoi(optarg);
-					break;
 				case 'b':
 					bankId = optarg;
 					break;
@@ -121,22 +46,45 @@ int main(int argc, char* argv[]){
 					break;
 			}
 		}
-		char* cardNumber = malloc(16);
-		char* messageType = malloc(7);
-		char* value = malloc(14); // only 13 digit needed for the richest man of the world
+		char cardNumber[16];
+		char messageType[7];
+		char value[14]; // only 13 digit needed for the richest man of the world
 		char* string;
 		int end = 0;
-
-		char bankFifo[10+4+4+5+1]; // "resources/" + "bank" + bankId + .fifo + '\0'
-		strncpy(bankFifo,"resources/bank",14);
-		strncat(bankFifo,bankId,4);
-		strncat(bankFifo,".fifo",5);
-		mkfifo("resources/interbancaire.fifo",0644);
-		int interbancaire = open("resources/interbancaire.fifo",O_WRONLY);
-		int interReadFD = open(bankFifo,O_RDONLY);
-		mkfifo(bankFifo,0644);
+		char fifoPath[64] = {0};
+		
+		sprintf(fifoPath,"resources/%.4s.fifo",bankId);
+		mkfifo(fifoPath,DEFAULT);
+		int bank = open(fifoPath,O_RDONLY);
+		
+		sprintf(fifoPath,"resources/localAuth%.4s.fifo",bankId);
+		mkfifo(fifoPath,DEFAULT);
+		int localAuth = open(fifoPath,O_WRONLY);
+		
+		RemotePipe remotePipes;
+		
+		sprintf(fifoPath,"resources/remoteAuth%.4s.fifo",bankId);
+		mkfifo(fifoPath,DEFAULT);
+		remotePipes.auth = open(fifoPath,O_RDWR);
+		
+		sprintf(fifoPath,"resources/remoteRouter%.4s.fifo",bankId);
+		mkfifo(fifoPath,DEFAULT);
+		remotePipes.router = open(fifoPath,O_RDWR);
+		
+		sprintf(fifoPath,"resources/remoteInter%.4s.fifo",bankId);
+		mkfifo(fifoPath,DEFAULT);
+		remotePipes.inter = open(fifoPath,O_RDWR);
+		
+		
+		sprintf(fifoPath,"resources/localInter%.4s.fifo",bankId);
+		mkfifo(fifoPath,DEFAULT);
+		int localInter = open(fifoPath,O_RDWR);
+		
+		pthread_t remoteThread;
+		pthread_create(&remoteThread, NULL, routeRemoteRequest, &remotePipes);
+		
 		while(!end){
-			string = litLigne(readFD);
+			string = litLigne(bank);
 			if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
 				perror("(acquisition)message in wrong format");
 				end = 1;
@@ -144,9 +92,9 @@ int main(int argc, char* argv[]){
 			}
 			if(strcmp(messageType,"Demande") == 0){ //from terminal
 				if(strncmp(cardNumber,bankId,4) == 0){ // to autorisation
-					ecritLigne(writeFD,string);
+					ecritLigne(localAuth,string);
 				}else{ // to interbancaire
-					ecritLigne(interbancaire,string);
+					ecritLigne(localInter,string);
 				}
 			}else{  //from autorisation / to terminal
 				char* fifo = malloc(10+16+5+1); // resources/ + card code + .fifo + '\0' = 32
@@ -158,10 +106,38 @@ int main(int argc, char* argv[]){
 			}
 			free(string);
 		}
+		
+		if(pthread_join(remoteThread,NULL)){
+			perror("local auth");
+		}
 	}else{
 		printHelp(argv[0]);
 	}
  return 0;
+}
+
+void* routeRemoteRequest(void* pipes_){
+	RemotePipe *remote = pipes_;
+	char cardNumber[16];
+	char messageType[7];
+	char value[14]; // only 13 digit needed for the richest man of the world
+	char* string;
+	int end = 0;
+	while(!end){
+		string = litLigne(remote->router);
+		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
+			perror("(remote acquisition)message in wrong format");
+			end = 1;
+			continue;
+		}
+		if(strcmp(messageType,"Demande") == 0){
+			ecritLigne(remote->auth,string);
+		}else{
+			ecritLigne(remote->inter,string);
+		}
+		free(string);
+	}
+ return NULL;
 }
 
 void printHelp(const char* programName){
