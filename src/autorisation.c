@@ -45,27 +45,19 @@ int main(int argc, char* argv[]){
 		}
 		data = load("resources/annuaire.txt");
 		char pipeName[33] = {0};
-		strncpy(pipeName,"resources/localAuth",19);
-		strncat(pipeName,bankId,4);
-		strncat(pipeName,".fifo",5);
+		snprintf(pipeName,32,"resources/localAuth%.4s.fifo",bankId);
 		mkfifo(pipeName,DEFAULT);
 		int localAuth = open(pipeName,O_RDONLY);
 		
-		strncpy(pipeName,"resources/localRouter",21);
-		strncat(pipeName,bankId,4);
-		strncat(pipeName,".fifo",5);
+		snprintf(pipeName,32,"resources/localRouter%.4s.fifo",bankId);
 		mkfifo(pipeName,DEFAULT);
 		int localRouter = open(pipeName,O_WRONLY);
 		
-		strncpy(pipeName,"resources/remoteAuth",20);
-		strncat(pipeName,bankId,4);
-		strncat(pipeName,".fifo",5);
+		snprintf(pipeName,32,"resources/remoteAuth%.4s.fifo",bankId);
 		mkfifo(pipeName,DEFAULT);
 		int remoteAuth = open(pipeName,O_RDWR);
 		
-		strncpy(pipeName,"resources/remoteRouter",23);
-		strncat(pipeName,bankId,4);
-		strncat(pipeName,".fifo",5);
+		snprintf(pipeName,32,"resources/remoteRouter%.4s.fifo",bankId);
 		mkfifo(pipeName,DEFAULT);
 		int remoteRouter = open(pipeName,O_RDWR);
 		
