@@ -44,26 +44,29 @@ int main(int argc, char* argv[]){
 			}
 		}
 		data = load("resources/annuaire.txt");
-		char pipeName[33] = {0};
+		char bankPath[20] = {0};
+		char pipeName[64] = {0};
+		sprintf(bankPath,"resources/bank%.4s",bankId);
+		mkdir(bankPath,0755);
 		
-		snprintf(pipeName,32,"resources/localAuth%.4s.fifo",bankId);
+		sprintf(pipeName,"resources/%.4s/localAuthDemande.fifo",bankPath);
 		mkfifo(pipeName,DEFAULT);
-		int localAuth = open(pipeName,O_RDONLY);
+		int localDemand = open(pipeName,O_RDONLY);
 		
-		snprintf(pipeName,22,"resources/%.4s.fifo",bankId);
+		snprintf(pipeName,22,"resources/%.4s/input.fifo",bankPath);
 		mkfifo(pipeName,DEFAULT);
-		int localRouter = open(pipeName,O_WRONLY);
+		int localResponse = open(pipeName,O_WRONLY);
 		
-		snprintf(pipeName,32,"resources/remoteAuth%.4s.fifo",bankId);
+		snprintf(pipeName,32,"resources/%.4s/remoteAuthDemande.fifo",bankPath);
 		mkfifo(pipeName,DEFAULT);
-		int remoteAuth = open(pipeName,O_RDWR);
+		int remoteDemand = open(pipeName,O_RDONLY);
 		
-		snprintf(pipeName,32,"resources/remoteRouter%.4s.fifo",bankId);
+		snprintf(pipeName,32,"resources/%.4s/remoteAuthRéponse.fifo",bankPath);
 		mkfifo(pipeName,DEFAULT);
-		int remoteRouter = open(pipeName,O_RDWR);
+		int remoteResponse = open(pipeName,O_WRONLY);
 		
-		int localPipe[] = {localAuth,localRouter};
-		int remotePipe[] = {remoteAuth,remoteRouter};
+		int localPipe[] = {localDemand,localResponse};
+		int remotePipe[] = {remoteDemand,remoteResponse};
 		
 		pthread_t local;
 		pthread_create(&local, NULL, authenticate, localPipe);
