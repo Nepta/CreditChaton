@@ -50,7 +50,7 @@ int main(int argc, char* argv[]){
 				end = 1;
 				continue;
 			}
-			string = message(account,"Demande","0");
+			string = message(account,"Demande","1");
 			ecritLigne(bank,string);
 			
 			sprintf(responseFifo,"resources/bank%.4s/%.16s.fifo",bankId,account);

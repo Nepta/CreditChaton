@@ -32,7 +32,7 @@ void* remoteAuth();
 static int threadPoolPipe[2];
 
 int main(int argc, char* argv[]){
-	char* bankList[] = {"0000","0001"};
+	char* bankList[] = {"0000","1111"};
 	int bankListSize = 2;
 	int poolSize = 9;
 	pipe(threadPoolPipe);
@@ -45,20 +45,20 @@ int main(int argc, char* argv[]){
 		mkdir(bankPath,0755);
 		char fifoPath[64] = {0};
 		int *remotePipe = malloc(2*sizeof (int));
-		
+
 		sprintf(fifoPath,"%s/interRemoteDemande.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe[READ] = open(fifoPath,O_RDONLY);
-	
-		sprintf(fifoPath,"%s/réponse.fifo",bankList[i]);
+
+		sprintf(fifoPath,"%s/input.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe[WRITE] = open(fifoPath,O_WRONLY);
-		threadId[i] = createThread(connection,remotePipe);
+		pthread_create(&threadId[i], NULL, (void* (*) (void*))connection, (void*)remotePipe);
 	}
 	
 	for(int i=0; i<poolSize; i++){
 		pthread_t threadId;
-		pthread_create(&threadId, NULL, remoteAuth, NULL);
+		pthread_create((&threadId) + (i*sizeof (pthread_t)), NULL, remoteAuth, NULL);
 	}
 	
 	for(int i=0; i<bankListSize; i++){
@@ -73,15 +73,16 @@ int searchBank(char bankId[5]){
 	return bank[atoi(bankId)];
 }
 
-void* connection(int associatedBank[2]){
-	char cardNumber[16];
-	char messageType[7];
-	char value[14]; // only 13 digit needed for the richest man of the world
+void* connection(int *associatedBank_){
+	int associatedBank[] = {associatedBank_[0], associatedBank_[1]};
+	char cardNumber[16+1];
+	char messageType[7+1];
+	char value[13+1]; // only 13 digit needed for the richest man of the world
 	int end = 0;
 	while(!end){
 		char* string = litLigne(associatedBank[READ]);
 		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
-			perror("(interbancaire(connection))message is wrong format");
+			perror("(interbancaire(connection)) message is wrong format");
 			end = 1;
 			break;
 		}
@@ -90,17 +91,18 @@ void* connection(int associatedBank[2]){
 		remotePipe->bankResponse = associatedBank[WRITE];
 	
 		char bankPath[20] = {0};
-		sprintf(bankPath,"resources/bank%.4s",cardNumber+1);
+		sprintf(bankPath,"resources/bank%.4s",cardNumber);
 		mkdir(bankPath,0755);
-
 		char fifoPath[64] = {0};
 		sprintf(fifoPath,"%s/interDemande.fifo",bankPath);
+
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe->interDemand = open(fifoPath,O_WRONLY);
-	
 		sprintf(fifoPath,"%s/interRéponse.fifo",bankPath);
+
 		mkfifo(fifoPath,DEFAULT);
-		remotePipe->interResponse = open(fifoPath,O_WRONLY);
+		remotePipe->interResponse = open(fifoPath,O_RDONLY);
+		
 		RemoteAuthData *data = malloc(sizeof (RemoteAuthData));
 		data->pipe = remotePipe;
 		data->string = string;

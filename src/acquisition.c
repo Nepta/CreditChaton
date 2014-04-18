@@ -12,7 +12,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <errno.h>
-#include "communicationThread.h"
+#include <pthread.h>
 #include "../libCarteBancaire/lectureEcriture.h"
 #include "../libCarteBancaire/message.h"
 
@@ -29,7 +29,7 @@ struct option longopts[] = {
 };
 
 void printHelp(const char* programName);
-void* routeRemoteRequest(void* pipe);
+void* routeRemoteRequest(char* bankPath);
 
 int main(int argc, char* argv[]){
 	if(argc == 3){
@@ -47,49 +47,29 @@ int main(int argc, char* argv[]){
 					break;
 			}
 		}
-		char cardNumber[16];
-		char messageType[7];
-		char value[14]; // only 13 digit needed for the richest man of the world
+		char cardNumber[16+1];
+		char messageType[7+1];
+		char value[13+1]; // only 13 digit needed for the richest man of the world
 		char* string;
 		int end = 0;
 		char bankPath[20] = {0};
 		char fifoPath[64] = {0};
 		sprintf(bankPath,"resources/bank%.4s",bankId);
 		mkdir(bankPath,0755);
-		
-		sprintf(fifoPath,"%s/input.fifo",bankPath);
-		mkfifo(fifoPath,DEFAULT);
-		int bank = open(fifoPath,O_RDONLY);
-		
+
 		sprintf(fifoPath,"%s/localAuth.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
 		int localAuth = open(fifoPath,O_WRONLY);
-		
-		RemotePipe remotePipes;
-		
-		sprintf(fifoPath,"%s/remoteAuthDemande.fifo",bankPath);
+
+		sprintf(fifoPath,"%s/input.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
-		remotePipes.authDemand = open(fifoPath,O_WRONLY);
-		
-		sprintf(fifoPath,"%s/remoteAuthRéponse.fifo",bankPath);
-		mkfifo(fifoPath,DEFAULT);
-		remotePipes.authResponse = open(fifoPath,O_RDONLY);
-		
-		sprintf(fifoPath,"%s/interDemande.fifo",bankPath);
-		mkfifo(fifoPath,DEFAULT);
-		remotePipes.interDemand = open(fifoPath,O_RDONLY);
-		
-		
-		sprintf(fifoPath,"%s/interRéponse.fifo",bankPath);
-		mkfifo(fifoPath,DEFAULT);
-		remotePipes.interResponse = open(fifoPath,O_WRONLY);
-		
+		int bank = open(fifoPath,O_RDONLY);
+
 		sprintf(fifoPath,"%s/interRemoteDemande.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
 		int localInter = open(fifoPath,O_WRONLY);
-		
 		pthread_t remoteThread;
-		pthread_create(&remoteThread, NULL, routeRemoteRequest, &remotePipes);
+		pthread_create(&remoteThread, NULL, (void* (*) (void*))routeRemoteRequest, (void*)&bankPath);
 		
 		while(!end){
 			string = litLigne(bank);
@@ -124,30 +104,49 @@ int main(int argc, char* argv[]){
  return 0;
 }
 
-void* routeRemoteRequest(void* pipes_){
-	RemotePipe *remote = pipes_;
-	char cardNumber[16];
-	char messageType[7];
-	char value[14]; // only 13 digit needed for the richest man of the world
+void* routeRemoteRequest(char* bankPath){
+	char remoteFifo[64];
+	RemotePipe remote;
+
+	sprintf(remoteFifo,"%s/remoteAuthDemande.fifo",bankPath);
+	errno = 0;
+	mkfifo(remoteFifo,DEFAULT);
+	remote.authDemand = open(remoteFifo,O_WRONLY);
+
+	sprintf(remoteFifo,"%s/remoteAuthRéponse.fifo",bankPath);
+	mkfifo(remoteFifo,DEFAULT);
+	remote.authResponse = open(remoteFifo,O_RDONLY);
+
+	sprintf(remoteFifo,"%s/interDemande.fifo",bankPath);
+	mkfifo(remoteFifo,DEFAULT);
+	remote.interDemand = open(remoteFifo,O_RDONLY);
+
+	sprintf(remoteFifo,"%s/interRéponse.fifo",bankPath);
+	mkfifo(remoteFifo,DEFAULT);
+	remote.interResponse = open(remoteFifo,O_WRONLY);
+
+	char cardNumber[16+1];
+	char messageType[7+1];
+	char value[13+1]; // only 13 digit needed for the richest man of the world
 	char* string;
 	int end = 0;
 	while(!end){
-		string = litLigne(remote->interDemand);
+		string = litLigne(remote.interDemand);
 		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
-			perror("(remote acquisition)message in wrong format");
+			perror("(remote acquisition) message in wrong format");
 			end = 1;
 			continue;
 		}
-		ecritLigne(remote->authDemand,string);
+		ecritLigne(remote.authDemand,string);
 		free(string);
 		
-		string = litLigne(remote->interResponse);
+		string = litLigne(remote.authResponse);
 		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
-			perror("(remote acquisition)message in wrong format");
+			perror("(remote acquisition) message in wrong format");
 			end = 1;
 			continue;
 		}
-		ecritLigne(remote->authResponse,string);
+		ecritLigne(remote.interResponse,string);
 		free(string);
 	}
  return NULL;

@@ -111,6 +111,7 @@ void* authenticate(void* pipe_){
 		string = litLigne(pipe[READ]);
 		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
 			perror("(autorisation)message in wrong format");
+			fprintf(stderr,"%s\n",string);
 			end = 1;
 		}
 		if(exist(data,cardNumber)){
