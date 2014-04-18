@@ -28,7 +28,7 @@ void printHelp(const char* programName);
 void* authenticate(void* pipe);
 
 int main(int argc, char* argv[]){
-	if(argc == 2){
+	if(argc == 3){
 		opterr = 0;
 		int indexptr;
 		int opt;
@@ -44,30 +44,30 @@ int main(int argc, char* argv[]){
 			}
 		}
 		data = load("resources/annuaire.txt");
-		char pipeName[23];
-		strncpy(pipeName,"localAuth",9);
+		char pipeName[33] = {0};
+		strncpy(pipeName,"resources/localAuth",19);
 		strncat(pipeName,bankId,4);
 		strncat(pipeName,".fifo",5);
 		mkfifo(pipeName,DEFAULT);
 		int localAuth = open(pipeName,O_RDONLY);
 		
-		strncpy(pipeName,"localRouter",11);
+		strncpy(pipeName,"resources/localRouter",21);
 		strncat(pipeName,bankId,4);
 		strncat(pipeName,".fifo",5);
 		mkfifo(pipeName,DEFAULT);
 		int localRouter = open(pipeName,O_WRONLY);
 		
-		strncpy(pipeName,"remoteAuth",10);
+		strncpy(pipeName,"resources/remoteAuth",20);
 		strncat(pipeName,bankId,4);
 		strncat(pipeName,".fifo",5);
 		mkfifo(pipeName,DEFAULT);
-		int remoteAuth = open(pipeName,O_RDONLY);
+		int remoteAuth = open(pipeName,O_RDWR);
 		
-		strncpy(pipeName,"remoteRouter",13);
+		strncpy(pipeName,"resources/remoteRouter",23);
 		strncat(pipeName,bankId,4);
 		strncat(pipeName,".fifo",5);
 		mkfifo(pipeName,DEFAULT);
-		int remoteRouter = open(pipeName,O_WRONLY);
+		int remoteRouter = open(pipeName,O_RDWR);
 		
 		int localPipe[] = {localAuth,localRouter};
 		int remotePipe[] = {remoteAuth,remoteRouter};
@@ -88,13 +88,7 @@ int main(int argc, char* argv[]){
 }
 
 void printHelp(const char* programName){
-	fprintf(	stderr,
-				"Usage : %s [OPTION]...\n"
-				"  -i,--input\t file descriptor to read into (mandatory)\n"
-				"  -o,--output\t file descriptor to write into (mandatory)\n"
-				"  -b,--bank\t bank id (mandatory)\n",
-				programName
-	);
+	fprintf(stderr,"Usage : %s -b <bankId>\n",programName);
 }
 
 void* authenticate(void* pipe_){
@@ -111,7 +105,6 @@ void* authenticate(void* pipe_){
 		string = litLigne(pipe[READ]);
 		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
 			perror("(autorisation)message in wrong format");
-			fprintf(stderr,"%s\n",string);
 			end = 1;
 		}
 		if(exist(data,cardNumber)){
@@ -119,6 +112,7 @@ void* authenticate(void* pipe_){
 		}else{
 			sprintf(string,"|%s|Réponse|%d|\n",cardNumber,NACK);
 		}
+		
 		ecritLigne(pipe[WRITE],string);
 		free(string);
 	}
