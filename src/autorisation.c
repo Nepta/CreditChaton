@@ -49,19 +49,19 @@ int main(int argc, char* argv[]){
 		sprintf(bankPath,"resources/bank%.4s",bankId);
 		mkdir(bankPath,0755);
 		
-		sprintf(pipeName,"resources/%.4s/localAuthDemande.fifo",bankPath);
+		sprintf(pipeName,"%s/localAuthDemande.fifo",bankPath);
 		mkfifo(pipeName,DEFAULT);
 		int localDemand = open(pipeName,O_RDONLY);
 		
-		snprintf(pipeName,22,"resources/%.4s/input.fifo",bankPath);
+		sprintf(pipeName,"%s/input.fifo",bankPath);
 		mkfifo(pipeName,DEFAULT);
 		int localResponse = open(pipeName,O_WRONLY);
 		
-		snprintf(pipeName,32,"resources/%.4s/remoteAuthDemande.fifo",bankPath);
+		sprintf(pipeName,"%s/remoteAuthDemande.fifo",bankPath);
 		mkfifo(pipeName,DEFAULT);
 		int remoteDemand = open(pipeName,O_RDONLY);
 		
-		snprintf(pipeName,32,"resources/%.4s/remoteAuthRéponse.fifo",bankPath);
+		sprintf(pipeName,"%s/remoteAuthRéponse.fifo",bankPath);
 		mkfifo(pipeName,DEFAULT);
 		int remoteResponse = open(pipeName,O_WRONLY);
 		
@@ -104,6 +104,7 @@ void* authenticate(void* pipe_){
 		string = litLigne(pipe[READ]);
 		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
 			perror("(autorisation)message in wrong format");
+			fprintf(stderr,"%s\n",string);
 			end = 1;
 		}
 		if(exist(data,cardNumber)){
