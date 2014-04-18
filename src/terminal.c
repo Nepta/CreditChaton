@@ -35,9 +35,10 @@ int main(int argc, char* argv[]){
 		}
 		char* string;
 		char end = 0;
-		char bankFifo[22];
+		char bankFifo[64];
 		char responseFifo[33];
-		snprintf(bankFifo,21,"resources/%.4s.fifo",bankId);
+		
+		sprintf(bankFifo,"resources/bank%.4s/input.fifo",bankId);
 		mkfifo(bankFifo,DEFAULT);
 		int bank = open(bankFifo,O_WRONLY);
 	 	char* account = malloc(10+16+5+1); // resources/ + card code + .fifo + '\0'
@@ -52,7 +53,7 @@ int main(int argc, char* argv[]){
 			string = message(account,"Demande","0");
 			ecritLigne(bank,string);
 			
-			snprintf(responseFifo,32,"resources/%.16s.fifo",account);
+			snprintf(responseFifo,32,"resources/bank%.4s/%.16s.fifo",bankId,account);
 			mkfifo(responseFifo,DEFAULT);
 			int response = open(responseFifo,O_RDONLY);
 			free(string);

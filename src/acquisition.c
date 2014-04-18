@@ -17,9 +17,10 @@
 #include "../libCarteBancaire/message.h"
 
 typedef struct{
-	int auth;
-	int router;
-	int inter;
+	int authDemand;
+	int authResponse;
+	int interDemand;
+	int interResponse;
 }RemotePipe;
 
 const int DEFAULT = 0644;
@@ -51,34 +52,41 @@ int main(int argc, char* argv[]){
 		char value[14]; // only 13 digit needed for the richest man of the world
 		char* string;
 		int end = 0;
+		char bankPath[20] = {0};
 		char fifoPath[64] = {0};
+		sprintf(bankPath,"resources/bank%.4s",bankId);
+		mkdir(bankPath,0755);
 		
-		sprintf(fifoPath,"resources/%.4s.fifo",bankId);
+		sprintf(fifoPath,"%s/input.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
 		int bank = open(fifoPath,O_RDONLY);
 		
-		sprintf(fifoPath,"resources/localAuth%.4s.fifo",bankId);
+		sprintf(fifoPath,"%s/localAuth.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
 		int localAuth = open(fifoPath,O_WRONLY);
 		
 		RemotePipe remotePipes;
 		
-		sprintf(fifoPath,"resources/remoteAuth%.4s.fifo",bankId);
+		sprintf(fifoPath,"%s/remoteAuthDemande.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
-		remotePipes.auth = open(fifoPath,O_RDWR);
+		remotePipes.authDemand = open(fifoPath,O_WRONLY);
 		
-		sprintf(fifoPath,"resources/remoteRouter%.4s.fifo",bankId);
+		sprintf(fifoPath,"%s/remoteAuthRéponse.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
-		remotePipes.router = open(fifoPath,O_RDWR);
+		remotePipes.authResponse = open(fifoPath,O_RDONLY);
 		
-		sprintf(fifoPath,"resources/remoteInter%.4s.fifo",bankId);
+		sprintf(fifoPath,"%s/interDemande.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
-		remotePipes.inter = open(fifoPath,O_RDWR);
+		remotePipes.interDemand = open(fifoPath,O_RDONLY);
 		
 		
-		sprintf(fifoPath,"resources/localInter%.4s.fifo",bankId);
+		sprintf(fifoPath,"%s/interRéponse.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
-		int localInter = open(fifoPath,O_RDWR);
+		remotePipes.interResponse = open(fifoPath,O_WRONLY);
+		
+		sprintf(fifoPath,"%s/interRemoteDemande.fifo",bankPath);
+		mkfifo(fifoPath,DEFAULT);
+		int localInter = open(fifoPath,O_WRONLY);
 		
 		pthread_t remoteThread;
 		pthread_create(&remoteThread, NULL, routeRemoteRequest, &remotePipes);
@@ -90,6 +98,7 @@ int main(int argc, char* argv[]){
 				end = 1;
 				continue;
 			}
+			
 			if(strcmp(messageType,"Demande") == 0){ //from terminal
 				if(strncmp(cardNumber,bankId,4) == 0){ // to autorisation
 					ecritLigne(localAuth,string);
@@ -97,10 +106,9 @@ int main(int argc, char* argv[]){
 					ecritLigne(localInter,string);
 				}
 			}else{  //from autorisation / to terminal
-				char* fifo = malloc(10+16+5+1); // resources/ + card code + .fifo + '\0' = 32
-				snprintf(fifo,32,"resources/%s.fifo",cardNumber);
+				char fifo[64] = {0}; // resources/ + card code + .fifo + '\0' = 32
+				sprintf(fifo,"resources/%.4s/%s.fifo",bankId,cardNumber);
 				int term = open(fifo,O_WRONLY);
-				free(fifo);
 				ecritLigne(term,string);
 				close(term);
 			}
@@ -124,17 +132,22 @@ void* routeRemoteRequest(void* pipes_){
 	char* string;
 	int end = 0;
 	while(!end){
-		string = litLigne(remote->router);
+		string = litLigne(remote->interDemand);
 		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
 			perror("(remote acquisition)message in wrong format");
 			end = 1;
 			continue;
 		}
-		if(strcmp(messageType,"Demande") == 0){
-			ecritLigne(remote->auth,string);
-		}else{
-			ecritLigne(remote->inter,string);
+		ecritLigne(remote->authDemand,string);
+		free(string);
+		
+		string = litLigne(remote->interResponse);
+		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
+			perror("(remote acquisition)message in wrong format");
+			end = 1;
+			continue;
 		}
+		ecritLigne(remote->authResponse,string);
 		free(string);
 	}
  return NULL;
@@ -149,5 +162,4 @@ void printHelp(const char* programName){
 				programName
 	);
 }
-
 
