@@ -49,7 +49,7 @@ int main(int argc, char* argv[]){
 		sprintf(bankPath,"resources/bank%.4s",bankId);
 		mkdir(bankPath,0755);
 		
-		sprintf(pipeName,"%s/localAuthDemande.fifo",bankPath);
+		sprintf(pipeName,"%s/localAuth.fifo",bankPath);
 		mkfifo(pipeName,DEFAULT);
 		int localDemand = open(pipeName,O_RDONLY);
 		
@@ -92,9 +92,9 @@ void printHelp(const char* programName){
 
 void* authenticate(void* pipe_){
 	int *pipe = pipe_;
-	char* cardNumber = malloc(16);
-	char* messageType = malloc(7);
-	char* value = malloc(14); // only 13 digit needed for the richest of the world
+	char* cardNumber = malloc(16+1);
+	char* messageType = malloc(7+1);
+	char* value = malloc(13+1); // only 13 digit needed for the richest of the world
 	char* string;
 	char end = 0;
 	while(!end){
