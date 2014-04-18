@@ -195,6 +195,50 @@ ifeq ($(config),release)
   endef
 endif
 
+ifeq ($(config),debug)
+  OBJDIR     = obj/debug/autorisation
+  TARGETDIR  = .
+  TARGET     = $(TARGETDIR)/autorisation
+  DEFINES   += 
+  INCLUDES  += 
+  CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
+  CXXFLAGS  += $(CFLAGS) 
+  LDFLAGS   += -pthread -L.
+  LIBS      += -llibCarteBancaire -llibAnnuaire
+  RESFLAGS  += $(DEFINES) $(INCLUDES) 
+  LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
+
+ifeq ($(config),release)
+  OBJDIR     = obj/release/autorisation
+  TARGETDIR  = .
+  TARGET     = $(TARGETDIR)/autorisation
+  DEFINES   += 
+  INCLUDES  += 
+  CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -O3 -std=c99
+  CXXFLAGS  += $(CFLAGS) 
+  LDFLAGS   += -s -pthread -L.
+  LIBS      += -llibCarteBancaire -llibAnnuaire
+  RESFLAGS  += $(DEFINES) $(INCLUDES) 
+  LDDEPS    += liblibCarteBancaire.a liblibAnnuaire.a
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
+
 ifeq ($(config),release)
   OBJDIR     = obj/release/autorisation
   TARGETDIR  = .

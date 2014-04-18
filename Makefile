@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := terminal autorisation acquisition interbancaire fileToDescriptor libCarteBancaire libAnnuaire
+PROJECTS := terminal randGen autorisation acquisition interbancaire fileToDescriptor libCarteBancaire libAnnuaire
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -15,6 +15,10 @@ all: $(PROJECTS)
 terminal: libCarteBancaire
 	@echo "==== Building terminal ($(config)) ===="
 	@${MAKE} --no-print-directory -C . -f terminal.make
+
+randGen: 
+	@echo "==== Building randGen ($(config)) ===="
+	@${MAKE} --no-print-directory -C . -f randGen.make
 
 autorisation: libCarteBancaire libAnnuaire
 	@echo "==== Building autorisation ($(config)) ===="
@@ -42,6 +46,7 @@ libAnnuaire:
 
 clean:
 	@${MAKE} --no-print-directory -C . -f terminal.make clean
+	@${MAKE} --no-print-directory -C . -f randGen.make clean
 	@${MAKE} --no-print-directory -C . -f autorisation.make clean
 	@${MAKE} --no-print-directory -C . -f acquisition.make clean
 	@${MAKE} --no-print-directory -C . -f interbancaire.make clean
@@ -58,11 +63,12 @@ run:
 	@${MAKE} -s --no-print-directory -C . -f run.make
 
 
-
 help:
 	@echo "Usage: make [config=name] [target]"
 	@echo ""
 	@echo "CONFIGURATIONS:"
+	@echo "   debug"
+	@echo "   release"
 	@echo "   debug"
 	@echo "   release"
 	@echo "   debug"
@@ -78,13 +84,14 @@ help:
 	@echo "   all (default)"
 	@echo "   clean"
 	@echo "   terminal"
+	@echo "   randGen"
 	@echo "   autorisation"
 	@echo "   acquisition"
 	@echo "   interbancaire"
 	@echo "   fileToDescriptor"
 	@echo "   libCarteBancaire"
 	@echo "   libAnnuaire"
-	@echo "   doxygen"
-	@echo "   run"
+	@echo "   debug"
+	@echo "   release"
 	@echo ""
 	@echo "For more information, see http://industriousone.com/premake/quick-start"

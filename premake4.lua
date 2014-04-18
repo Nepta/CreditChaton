@@ -17,6 +17,13 @@ solution "Template"
 		excludes{"src/test*.c"}
 		links {"libCarteBancaire"}
 
+	project "randGen"
+		configurations {"debug", "release"}
+		kind "ConsoleApp"
+		language "C"
+
+		files {"src/idGenerator.c"}
+
 	project "autorisation"
 		configurations {"debug", "release"}
 		kind "ConsoleApp"

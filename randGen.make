@@ -20,19 +20,19 @@ ifndef AR
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/debug/libCarteBancaire
+  OBJDIR     = obj/debug/randGen
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  TARGET     = $(TARGETDIR)/randGen
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -O3 -std=c99
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -pthread
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -42,9 +42,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/libCarteBancaire
+  OBJDIR     = obj/release/randGen
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  TARGET     = $(TARGETDIR)/randGen
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -54,7 +54,7 @@ ifeq ($(config),release)
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -64,19 +64,19 @@ ifeq ($(config),release)
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/debug/libCarteBancaire
+  OBJDIR     = obj/debug/randGen
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  TARGET     = $(TARGETDIR)/randGen
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -O3 -std=c99
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -pthread
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -86,9 +86,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/libCarteBancaire
+  OBJDIR     = obj/release/randGen
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  TARGET     = $(TARGETDIR)/randGen
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -98,7 +98,7 @@ ifeq ($(config),release)
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -108,19 +108,19 @@ ifeq ($(config),release)
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/debug/libCarteBancaire
+  OBJDIR     = obj/debug/randGen
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  TARGET     = $(TARGETDIR)/randGen
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -O3 -std=c99
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -pthread
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -130,9 +130,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/libCarteBancaire
+  OBJDIR     = obj/release/randGen
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  TARGET     = $(TARGETDIR)/randGen
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -142,7 +142,7 @@ ifeq ($(config),release)
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -152,19 +152,19 @@ ifeq ($(config),release)
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/debug/libCarteBancaire
+  OBJDIR     = obj/debug/randGen
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  TARGET     = $(TARGETDIR)/randGen
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -O3 -std=c99
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -pthread
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -174,9 +174,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/libCarteBancaire
+  OBJDIR     = obj/release/randGen
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  TARGET     = $(TARGETDIR)/randGen
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -186,7 +186,7 @@ ifeq ($(config),release)
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -196,19 +196,19 @@ ifeq ($(config),release)
 endif
 
 ifeq ($(config),debug)
-  OBJDIR     = obj/debug/libCarteBancaire
+  OBJDIR     = obj/debug/randGen
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  TARGET     = $(TARGETDIR)/randGen
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -O3 -std=c99
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -Wall -g -std=c99
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -pthread
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -218,9 +218,9 @@ ifeq ($(config),debug)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/libCarteBancaire
+  OBJDIR     = obj/release/randGen
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  TARGET     = $(TARGETDIR)/randGen
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -230,7 +230,7 @@ ifeq ($(config),release)
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -240,9 +240,9 @@ ifeq ($(config),release)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/libCarteBancaire
+  OBJDIR     = obj/release/randGen
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  TARGET     = $(TARGETDIR)/randGen
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -252,7 +252,7 @@ ifeq ($(config),release)
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -262,9 +262,9 @@ ifeq ($(config),release)
 endif
 
 ifeq ($(config),release)
-  OBJDIR     = obj/release/libCarteBancaire
+  OBJDIR     = obj/release/randGen
   TARGETDIR  = .
-  TARGET     = $(TARGETDIR)/liblibCarteBancaire.a
+  TARGET     = $(TARGETDIR)/randGen
   DEFINES   += 
   INCLUDES  += 
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -274,7 +274,7 @@ ifeq ($(config),release)
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(AR) -rcs $(TARGET) $(OBJECTS)
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -284,9 +284,7 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/alea.o \
-	$(OBJDIR)/message.o \
-	$(OBJDIR)/lectureEcriture.o \
+	$(OBJDIR)/idGenerator.o \
 
 RESOURCES := \
 
@@ -304,7 +302,7 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking libCarteBancaire
+	@echo Linking randGen
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -325,7 +323,7 @@ else
 endif
 
 clean:
-	@echo Cleaning libCarteBancaire
+	@echo Cleaning randGen
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -347,13 +345,7 @@ $(GCH): $(PCH)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/alea.o: libCarteBancaire/alea.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/message.o: libCarteBancaire/message.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/lectureEcriture.o: libCarteBancaire/lectureEcriture.c
+$(OBJDIR)/idGenerator.o: src/idGenerator.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 
