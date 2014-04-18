@@ -241,6 +241,7 @@ endif
 
 OBJECTS := \
 	$(OBJDIR)/interbancaire.o \
+	$(OBJDIR)/communicationThread.o \
 
 RESOURCES := \
 
@@ -302,6 +303,9 @@ $(GCH): $(PCH)
 endif
 
 $(OBJDIR)/interbancaire.o: src/interbancaire.c
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/communicationThread.o: src/communicationThread.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 

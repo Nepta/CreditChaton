@@ -12,17 +12,44 @@
 #include "../libCarteBancaire/message.h"
 #include "annuaire.h"
 
+static const int DEFAULT = 0644;
 static int bank[10000];
 int searchBank(char bankId[5]);
 void* connection(int pipe[2]);
 
+typedef struct{
+	int interResponse;
+	int interDemand;
+	int bankResponse;
+}ConnectionPipe;
+
+typedef struct{
+	ConnectionPipe *pipe;
+	char* string;
+}RemoteAuthData;
+
 int main(int argc, char* argv[]){
+	int bankList[] = {0000};
+	int bankListSize = 1;
 	int interbancaire[2];
 	mkfifo("resources/interbancaire.fifo",0644);
 /*	mkfifo("resources/bank0234",0644);*/
 	interbancaire[READ] = open("resources/interbancaire.fifo",O_RDONLY);
 /*	bank[1234] = open("resources/bank0234",O_WRONLY);*/
 	interbancaire[WRITE] = open("resources/acquisition.fifo",O_WRONLY);
+	for(int i=0; i<bankListSize; i++){
+		char fifoPath[64] = {0};
+		int *remotePipe = malloc(2*sizeof (int));
+		sprintf(fifoPath,"resources/interRemoteDemande%.4d.fifo",bankList[i]);
+		mkfifo(fifoPath,DEFAULT);
+		remotePipe[READ] = open(fifoPath,O_RDONLY);
+	
+		sprintf(fifoPath,"resources/réponse%.4d.fifo",bankList[i]);
+		mkfifo(fifoPath,DEFAULT);
+		remotePipe[WRITE] = open(fifoPath,O_WRONLY);
+		createThread(connection,remotePipe);
+	}
+	
 	void* end = 0;
 	while(!end){
 		end = connection(interbancaire);
@@ -39,15 +66,42 @@ void* connection(int pipe[2]){
 	char cardNumber[16];
 	char messageType[7];
 	char value[14]; // only 13 digit needed for the richest man of the world
-	char* string = litLigne(pipe[READ]);
-	if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
-		perror("(interbancaire)message is wrong format");
-		return 0;
+	int end = 0;
+	while(!end){
+		char* string = litLigne(pipe[READ]);
+		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
+			perror("(interbancaire(connection))message is wrong format");
+			end = 1;
+			break;
+		}
+	
+		ConnectionPipe remotePipe;
+		remotePipe.bankResponse = pipe[WRITE];
+	
+		char fifoPath[64] = {0};
+		sprintf(fifoPath,"resources/interDemande%.4d.fifo",bankList[i]);
+		mkfifo(fifoPath,DEFAULT);
+		remotePipe.interDemand = open(fifoPath,O_WRONLY);
+	
+		sprintf(fifoPath,"resources/interRéponse%.4d.fifo",bankList[i]);
+		mkfifo(fifoPath,DEFAULT);
+		remotePipe.interResponse = open(fifoPath,O_WRONLY);
+		RemoteAuthData *data = malloc(sizeof (RemoteAuthData));
+		data->pipe = remotePipe;
+		data->string = string;
+	/*	thread remoteAuth*/
 	}
-	free(string);
-	string = message(cardNumber,"Réponse",value);
-	ecritLigne(pipe[WRITE],string);
-	free(string);
 	return (void*)1;
+}
+
+void* remoteAuth(RemoteAuthData *data){
+	ConnectionPipe *pipe = data->pipe;
+	char* string = data->string;
+	ecritLigne(pipe->interDemand, string);
+	free(string);
+	string = litLigne(pipe->interResponse);
+	ecritLigne(pipe->bankResponse);
+	free(string);
+ return 0;
 }
 

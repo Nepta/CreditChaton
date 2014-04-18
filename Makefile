@@ -40,14 +40,6 @@ libAnnuaire:
 	@echo "==== Building libAnnuaire ($(config)) ===="
 	@${MAKE} --no-print-directory -C . -f libAnnuaire.make
 
-doxygen: 
-	@echo "==== Building doxygen ===="
-	@doxygen doc/Doxyfile
-
-run:
-	@echo "==== Runing auth and terminal ===="
-	@${MAKE} -s --no-print-directory -C . -f run.make
-
 clean:
 	@${MAKE} --no-print-directory -C . -f terminal.make clean
 	@${MAKE} --no-print-directory -C . -f autorisation.make clean
@@ -56,6 +48,16 @@ clean:
 	@${MAKE} --no-print-directory -C . -f fileToDescriptor.make clean
 	@${MAKE} --no-print-directory -C . -f libCarteBancaire.make clean
 	@${MAKE} --no-print-directory -C . -f libAnnuaire.make clean
+
+doxygen: 
+	@echo "==== Building doxygen ===="
+	@doxygen doc/Doxyfile
+
+run:
+	@echo "==== Runing auth and terminal ===="
+	@${MAKE} -s --no-print-directory -C . -f run.make
+
+
 
 help:
 	@echo "Usage: make [config=name] [target]"

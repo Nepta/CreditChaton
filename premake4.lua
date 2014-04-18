@@ -40,7 +40,7 @@ solution "Template"
 		kind "ConsoleApp"
 		language "C"
 		
-		files {"src/interbancaire.c"}
+		files {"src/interbancaire.c", "src/communicationThread.c"}
 		excludes{"src/test*.c"}
 		links {"libCarteBancaire","libAnnuaire"}
 
