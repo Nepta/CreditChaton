@@ -45,11 +45,12 @@ int main(int argc, char* argv[]){
 		}
 		data = load("resources/annuaire.txt");
 		char pipeName[33] = {0};
+		
 		snprintf(pipeName,32,"resources/localAuth%.4s.fifo",bankId);
 		mkfifo(pipeName,DEFAULT);
 		int localAuth = open(pipeName,O_RDONLY);
 		
-		snprintf(pipeName,32,"resources/localRouter%.4s.fifo",bankId);
+		snprintf(pipeName,22,"resources/%.4s.fifo",bankId);
 		mkfifo(pipeName,DEFAULT);
 		int localRouter = open(pipeName,O_WRONLY);
 		
@@ -63,8 +64,11 @@ int main(int argc, char* argv[]){
 		
 		int localPipe[] = {localAuth,localRouter};
 		int remotePipe[] = {remoteAuth,remoteRouter};
-		pthread_t local = createThread(authenticate,localPipe);
-		pthread_t remote = createThread(authenticate,remotePipe);
+		
+		pthread_t local;
+		pthread_create(&local, NULL, authenticate, localPipe);
+		pthread_t remote;
+		pthread_create(&remote, NULL, authenticate, remotePipe);
 		
 		if(pthread_join(local,NULL)){
 			perror("local auth");
@@ -104,7 +108,6 @@ void* authenticate(void* pipe_){
 		}else{
 			sprintf(string,"|%s|Réponse|%d|\n",cardNumber,NACK);
 		}
-		
 		ecritLigne(pipe[WRITE],string);
 		free(string);
 	}
