@@ -10,55 +10,55 @@
 #include "../libCarteBancaire/message.h"
 
 struct option longopts[] = {
-	{"input",	required_argument, 0, 'i'},
-	{"output",	required_argument, 0, 'o'}
+	{"bank",	required_argument, 0, 'o'}
 };
+
+static const int DEFAULT = 0644;
 
 void printHelp(const char* programName);
 
 int main(int argc, char* argv[]){
-	if(argc == 5){
+	if(argc == 3){
 		opterr = 0;
 		int indexptr;
 		int opt;
-		int readFD, writeFD;
-		while((opt = getopt_long(argc, argv, "i:o:",longopts, &indexptr)) != -1){
+		char* bankId;
+		while((opt = getopt_long(argc, argv, "b:",longopts, &indexptr)) != -1){
 			switch(opt){
-				case 'i':
-					readFD = atoi(optarg);
-					break;
-				case 'o':
-					writeFD = atoi(optarg);
+				case 'b':
+					bankId = optarg;
 					break;
 				default:
 					printHelp(argv[0]);
 					break;
 			}
 		}
-		char* msg;
 		char* string;
 		char end = 0;
+		char bankFifo[22];
+		char responseFifo[33];
+		snprintf(bankFifo,21,"resources/%.4s.fifo",bankId);
+		mkfifo(bankFifo,DEFAULT);
+		int bank = open(bankFifo,O_WRONLY);
+	 	char* account = malloc(10+16+5+1); // resources/ + card code + .fifo + '\0'
 		while(!end){
-		 	msg = malloc(10+16+5+1); // resources/ + card code + .fifo + '\0'
 		 	printf("card code:\n> ");
-		 	scanf("%16s",msg);
+		 	scanf("%16s",account);
 		 	scanf("%*[^\n]"); // clean stdin
-/*			strcpy(msg,"0234567890123456");*/
-			string = message(msg,"Demande","0");
-			if(strlen(string) < strlen("|XXXXXXXXXXXXXXXX|Demande|0|\n")){ // 29
+			if(strlen(account) < 16){
 				end = 1;
 				continue;
 			}
-			ecritLigne(writeFD,string);
+			string = message(account,"Demande","0");
+			ecritLigne(bank,string);
 			
-			snprintf(msg,32,"resources/%.16s.fifo",string+1);
-			mkfifo(msg,0644);
-			readFD = open(msg,O_RDONLY);
+			snprintf(responseFifo,32,"resources/%.16s.fifo",account);
+			mkfifo(responseFifo,DEFAULT);
+			int response = open(responseFifo,O_RDONLY);
 			free(string);
-			string = litLigne(readFD);
-			close(readFD);
-			unlink(msg);
-			free(msg);
+			string = litLigne(response);
+			close(response);
+			unlink(responseFifo);
 			
 			int ack = (int)(string[27] - '0');
 			if(ack){
@@ -68,6 +68,7 @@ int main(int argc, char* argv[]){
 			}
 			free(string);
 		}
+		free(account);
 	}else{
 		printHelp(argv[0]);
 	}

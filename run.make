@@ -4,10 +4,10 @@ endif
 
 ifeq ($(example),default)
 default: cleanFifo
-	@./interbancaire &
-	@./fileToDescriptor -i resources/localRouter0000.fifo -o resources/localAuth0000.fifo -- ./acquisition -b 0000 &
+#	@./interbancaire &
+	@./acquisition -b 0000 &
 	@./autorisation -b 0000 &
-	@./fileToDescriptor -i resources/autorisation.fifo -o resources/localRouter0000.fifo -- ./terminal
+	@./terminal -b 0000
 endif
 
 ifeq ($(example),ata)
