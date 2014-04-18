@@ -28,18 +28,17 @@ typedef struct{
 	char* string;
 }RemoteAuthData;
 
-static int threadPool[2];
+void* remoteAuth();
+static int threadPoolPipe[2];
 
 int main(int argc, char* argv[]){
-	int bankList[] = {0000};
-	int bankListSize = 1;
-	int interbancaire[2];
-	mkfifo("resources/interbancaire.fifo",0644);
-/*	mkfifo("resources/bank0234",0644);*/
-	interbancaire[READ] = open("resources/interbancaire.fifo",O_RDONLY);
-/*	bank[1234] = open("resources/bank0234",O_WRONLY);*/
-	interbancaire[WRITE] = open("resources/acquisition.fifo",O_WRONLY);
-	pipe(threadPool);
+	int bankList[] = {0000,0001};
+	int bankListSize = 2;
+	int poolSize = 9;
+	pipe(threadPoolPipe);
+	
+	pthread_t threadId[bankListSize];
+	
 	for(int i=0; i<bankListSize; i++){
 		char fifoPath[64] = {0};
 		int *remotePipe = malloc(2*sizeof (int));
@@ -50,13 +49,18 @@ int main(int argc, char* argv[]){
 		sprintf(fifoPath,"resources/réponse%.4d.fifo",bankList[i]);
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe[WRITE] = open(fifoPath,O_WRONLY);
-		createThread(connection,remotePipe);
+		threadId[i] = createThread(connection,remotePipe);
 	}
 	
-	void* end = 0;
-	while(!end){
-		end = connection(interbancaire);
+	for(int i=0; i<poolSize; i++){
+		pthread_t threadId;
+		pthread_create(&threadId, NULL, remoteAuth, NULL);
 	}
+	
+	for(int i=0; i<bankListSize; i++){
+		pthread_join(threadId[i],NULL);
+	}
+		
  return 0;
 }
 
@@ -92,14 +96,14 @@ void* connection(int associatedBank[2]){
 		RemoteAuthData *data = malloc(sizeof (RemoteAuthData));
 		data->pipe = remotePipe;
 		data->string = string;
-		write(threadPool[WRITE], &data, sizeof (void*));
+		write(threadPoolPipe[WRITE], &data, sizeof (void*));
 	}
 	return (void*)1;
 }
 
 void* remoteAuth(){
 	RemoteAuthData *data;
-	while(read(threadPool[READ], &data, sizeof (void*)) != -1){
+	while(read(threadPoolPipe[READ], &data, sizeof (void*)) != -1){
 		ConnectionPipe *remotePipe = data->pipe;
 		char* string = data->string;
 		ecritLigne(remotePipe->interDemand, string);
