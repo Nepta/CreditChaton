@@ -28,6 +28,8 @@ typedef struct{
 	char* string;
 }RemoteAuthData;
 
+static int threadPool[2];
+
 int main(int argc, char* argv[]){
 	int bankList[] = {0000};
 	int bankListSize = 1;
@@ -37,6 +39,7 @@ int main(int argc, char* argv[]){
 	interbancaire[READ] = open("resources/interbancaire.fifo",O_RDONLY);
 /*	bank[1234] = open("resources/bank0234",O_WRONLY);*/
 	interbancaire[WRITE] = open("resources/acquisition.fifo",O_WRONLY);
+	pipe(threadPool);
 	for(int i=0; i<bankListSize; i++){
 		char fifoPath[64] = {0};
 		int *remotePipe = malloc(2*sizeof (int));
@@ -62,46 +65,51 @@ int searchBank(char bankId[5]){
 	return bank[atoi(bankId)];
 }
 
-void* connection(int pipe[2]){
+void* connection(int associatedBank[2]){
 	char cardNumber[16];
 	char messageType[7];
 	char value[14]; // only 13 digit needed for the richest man of the world
 	int end = 0;
 	while(!end){
-		char* string = litLigne(pipe[READ]);
+		char* string = litLigne(associatedBank[READ]);
 		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
 			perror("(interbancaire(connection))message is wrong format");
 			end = 1;
 			break;
 		}
 	
-		ConnectionPipe remotePipe;
-		remotePipe.bankResponse = pipe[WRITE];
+		ConnectionPipe *remotePipe = malloc(sizeof (ConnectionPipe));
+		remotePipe->bankResponse = associatedBank[WRITE];
 	
 		char fifoPath[64] = {0};
-		sprintf(fifoPath,"resources/interDemande%.4d.fifo",bankList[i]);
+		sprintf(fifoPath,"resources/interDemande%.4s.fifo",cardNumber+1);
 		mkfifo(fifoPath,DEFAULT);
-		remotePipe.interDemand = open(fifoPath,O_WRONLY);
+		remotePipe->interDemand = open(fifoPath,O_WRONLY);
 	
-		sprintf(fifoPath,"resources/interRéponse%.4d.fifo",bankList[i]);
+		sprintf(fifoPath,"resources/interRéponse%.4s.fifo",cardNumber+1);
 		mkfifo(fifoPath,DEFAULT);
-		remotePipe.interResponse = open(fifoPath,O_WRONLY);
+		remotePipe->interResponse = open(fifoPath,O_WRONLY);
 		RemoteAuthData *data = malloc(sizeof (RemoteAuthData));
 		data->pipe = remotePipe;
 		data->string = string;
-	/*	thread remoteAuth*/
+		write(threadPool[WRITE], &data, sizeof (void*));
 	}
 	return (void*)1;
 }
 
-void* remoteAuth(RemoteAuthData *data){
-	ConnectionPipe *pipe = data->pipe;
-	char* string = data->string;
-	ecritLigne(pipe->interDemand, string);
-	free(string);
-	string = litLigne(pipe->interResponse);
-	ecritLigne(pipe->bankResponse);
-	free(string);
+void* remoteAuth(){
+	RemoteAuthData *data;
+	while(read(threadPool[READ], &data, sizeof (void*)) != -1){
+		ConnectionPipe *remotePipe = data->pipe;
+		char* string = data->string;
+		ecritLigne(remotePipe->interDemand, string);
+		free(string);
+		string = litLigne(remotePipe->interResponse);
+		ecritLigne(remotePipe->bankResponse, string);
+		free(remotePipe);
+		free(string);
+		free(data);
+	}
  return 0;
 }
 
