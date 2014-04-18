@@ -35,6 +35,7 @@ int main(int argc, char* argv[]){
 		switch(opt){
 			case 'i':
 				mkfifo(optarg,DEFAULT);
+				fprintf(stderr,"opening %s (r)\n",optarg);
 				readFD = open(optarg,O_RDONLY);
 				if(readFD == -1){
 					perror("read");
@@ -43,6 +44,7 @@ int main(int argc, char* argv[]){
 				break;
 			case 'o':
 				mkfifo(optarg,DEFAULT);
+				fprintf(stderr,"opening %s (w)\n",optarg);
 				writeFD = open(optarg,O_WRONLY);
 				if(writeFD == -1){
 					perror("write");
