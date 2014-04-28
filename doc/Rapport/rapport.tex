@@ -154,6 +154,11 @@
 \includegraphics[scale=0.5]{global}
 \end{center}
 \medskip
+
+Tout au long de se manuel, nous utiliserons la notion de connexion local et distante.
+Une connexion local signifie qu'un terminal associé à une banque émet une demande pour un débit sur un compte de cette même banque (terminal crédit chaton utiliser par un client de crédit chaton), alors qu'une connexion distante ce réfère à un client utilisant un terminal associé à une autre banque (client de la bénépé utilisant un terminal de crédit chaton).
+Ces deux cas traiter par le même serveur d'acquisition sont router différemment et passe par deux partie différente de l'application.
+
 \section{Serveurs mis en place}
 Pour cette simulation, un minimum de 3 serveurs sont nécessaire afin d'effectuer des transaction local
 (un client utilisant un terminal de sa banque),
@@ -220,7 +225,7 @@ Ce serveur est connecté à un tube en écriture et un en lecture.
 \end{description}
 \noindent
 (ici <cardNumber> signifie que le tube doit être nommé à l'aide du numéro de carte qui émet la demande)
-
+\graph{0.5}{terminal}
 \subsection{Autorisation}
 Ce serveur est connecté à deux tube en écriture et deux tubes en lecture.
 \begin{description}
@@ -229,7 +234,7 @@ Ce serveur est connecté à deux tube en écriture et deux tubes en lecture.
 	\item[resources/bank<bankId>/input.fifo] (write) permet d'envoyer les réponse au serveur d'acquisition
 	\item[resources/bank<bankId>/remoteInput.fifo] (write) permet d'envoyer des réponses au serveur interbancaire
 \end{description}
-
+\graph{0.5}{autorisation}
 \subsection{Acquisition}
 Ce serveur est connecté à 2 tubes en lecture et 5 tube en écriture.
 \begin{description}
@@ -241,6 +246,7 @@ Ce serveur est connecté à 2 tubes en lecture et 5 tube en écriture.
 	\item[resources/bank<bankId>/remoteAuthDemande.fifo] (write) permet d'envoyer une demande d'autorisation en provenance du serveur interbancaire
 	\item[resources/bank<bankId>/interRéponse.fifo] (write) permet de renvoyer une réponse du serveur d'autorisation vers le serveur interbancaire
 \end{description}
+\graph{0.5}{acquisition}
 
 \subsection{Interbancaire}
 Pour ce serveur, le nombre des tubes auquel il est connecté est dépendant du nombre de banque qu'il connecte.
@@ -254,6 +260,49 @@ Ainsi pour n banque relié, il gère 4n tube en lecture et 2n tu en écriture, i
 	\item[resources/bank<bankId>/input.fifo] (write) permet d'envoyer des réponses distante à une banque
 	\item[resources/bank<bankId>/remoteInput.fifo] (write) permet d'envoyer des demande d'autorisation à une banque
 \end{description}
+\graph{0.5}{interbancaire}
+
+\section{Fonctionnement des serveurs}
+\subsection{Terminal}
+Le terminal après avoir reçu une requête directement de l'entrée standard (stdin) qui correspond au numéro de carte du client, envoi une demande au serveur d'acquisition puis attend une réponse de ce même serveur avant de recommencer.
+\graph{0.4}{terminalState}
+
+\subsection{Autorisation}
+Le serveur d'autorisation est découper en deux partie exécutant la même fonction ayant pour différence la paire de tube connecté à ces threads.
+Ils reçoivent tout deux une demande sur leurs tube ouvert en lecture pour vérifier dans leurs annuaire la validité de la transaction, puis renvoient une réponse sur les tubes ouvert en écriture correspondant.
+L'annuaire est mise en mémoire depuis un fichier contenant un numéro de carte bancaire suivit de la somme disponible sur le compte et ce pour chaque ligne du fichier.
+Cette annuaire est formé par une structure contenant la taille de cette structure (correspondant au nombre de ligne du fichier chargé) et d'un tableau flexible de chaîne de caractère.
+\graph{0.4}{autorisationState}
+
+\subsection{Acquisition}
+Ce serveur est connecté a tous les autres et possède lui aussi deux partie.
+La première s'occupant des messages distant, ne fait que relayer les messages entre le serveur d'autorisation et le serveur interbancaire.
+\graph{0.5}{acquisitionStateRemote}
+La deuxième partie s'occupe des demande local. Elle reçoit dans son unique point d'entrée à la fois les demandes émise par les terminaux et les réponse du serveur d'autorisation.
+Les réponses sont directement retransmise aux terminaux, alors que les demande sont envoyer, soit au serveur d'autorisation si leurs code bancaire corresponde à sont numéro de banque, alors que les autres sont retransmise au serveur interbancaire.
+\graph{0.4}{acquisitionStateLocal}
+
+\subsection{Interbancaire}
+Le serveur interbancaire doit gérer les messages distant, une demande émise par une banque à l'attention d'un serveur d'autorisation distant.
+Pour cela, le serveur interbancaire créer une \og connection\fg{}, c'est a dire un thread associé à une série de tube, par banque.
+Ce thread permet de pouvoir différencier et retenir le chemin de chaque demande pour pouvoir renvoyer la réponse au bonne endroit.
+En plus de chaque connexion, et pour pouvoir gérer simultanément une multitude de message, le serveur interbancaire crée une piscine de processus léger (thread pool)
+permettant de stocker la route de retour et d'attendre le message d'autorisation distant.
+Cette quantité de thread créé correspond au nombre de message que peut traiter simultanément \\
+
+Chacun de ces threads de travail sont connecté à un tube servant à distribuer chaque demande au premier processus libre.
+Les différentes connections encapsule la demande en indiquant les information essentiel (message à transmettre, banque destinataire et banque de retour).
+Une fois un messages reçu par les threads de travail, le message est envoyer puis une réponse est attendu avant de pouvoir la renvoyer.
+Pour l'instant n'ayant pas implémenté un design plus souple et hautement plus compliqué, et afin que les réponse soit reçu par les threads les attendant, chacun d'eux vont verrouiller l'accès au tube de réponse distante associé à la banque à laquelle ils envoi leurs demande.
+
+\graph{0.4}{piscine}
+
+
+\subsubsection{Design plus souple et hautment plus compliqué}
+La solution pensé pour permettre a chaque thread de pouvoir recevoir la demande qu'il attendent serait de simplement broadcaster toute les réponses à tous les threads, c'est a dire crée un deuxième tube reliant chacun des thread à une sous routine \og broadcast\fg{} servant à copier les réponses à un tube dédié sur les processus de travail.
+En plus de ça, chacun des threads devra pour ne pas bloquer le broadcast, continuellement lire ce tube afin de rejeter les réponses qu'il n'attendent pas, en fonction d'un filtre mis en place avant l'envoi d'une demande.\\
+\noindent
+Ce pose alors un problème de scalabilité, afin de pouvoir simplement augmenter les performance en lançant un deuxième serveur interbancaire, chaque sous routine de broadcast devrons pouvoir communiquer entre elle afin qu'un broadcast d'un serveur interbancaire soit répercuter sur chacun des serveur interbancaire lancé.
 
 \section{Questions pré-projet}
 \begin{enumerate}
