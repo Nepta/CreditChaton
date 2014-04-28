@@ -167,7 +167,13 @@ void* remoteResponse(){
 		}
 	
 		sprintf(fifoPath,"%s/%s.fifo",bankPath,cardNumber);
+		mkfifo(fifoPath,DEFAULT);
 		int term = open(fifoPath,O_WRONLY);
+
+		if(term == -1){
+			perror("miaou");
+			fprintf(stderr,"%s:%d: pipe (%s)\n",__FILE__,__LINE__,string);
+		}
 		ecritLigne(term,string);
 		close(term);
 	}

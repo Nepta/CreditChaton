@@ -4,7 +4,7 @@ default: cleanFifo
 	@./autorisation -b 0000 &
 	@./acquisition -b 1111 &
 	@./autorisation -b 1111 &
-	@./randGen -b 1111 -n 2000  | ./terminal -b 0000 &
+	@./randGen -b 1111 -n 5000 | ./terminal -b 0000 &
 
 cleanFifo:
 	@rm resources/*/*.fifo || true

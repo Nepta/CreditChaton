@@ -92,7 +92,7 @@ void printHelp(const char* programName){
 }
 
 void* authenticate(void* pipe_){
-	int *pipe = pipe_;
+	int *authPipe = pipe_;
 	char cardNumber[16+1];
 	char messageType[7+1];
 	char value[13+1]; // only 13 digit needed for the richest of the world
@@ -102,7 +102,7 @@ void* authenticate(void* pipe_){
 		cardNumber[0] = '\0';
 		messageType[0] = '\0';
 		value[0] = '\0';
-		string = litLigne(pipe[READ]);
+		string = litLigne(authPipe[READ]);
 		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
 			perror("(autorisation)message in wrong format");
 			fprintf(stderr,"%s\n",string);
@@ -114,8 +114,12 @@ void* authenticate(void* pipe_){
 		}else{
 			sprintf(string,"|%s|Réponse|%d|\n",cardNumber,NACK);
 		}
-		ecritLigne(pipe[WRITE],string);
+		ecritLigne(authPipe[WRITE],string);
 		free(string);
+		int test[2];
+		pipe(test);
+		close(test[0]);
+		close(test[1]);
 	}
 	return NULL;
 }
