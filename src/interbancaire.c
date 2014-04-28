@@ -143,6 +143,8 @@ void* remoteAuth(){
 		string = litLigne(remotePipe->interResponse);
 		pthread_mutex_unlock(bank+remotePipe->bankId);
 		ecritLigne(remotePipe->bankResponse, string);
+		close(remotePipe->interDemand);
+		close(remotePipe->bankResponse);
 		free(remotePipe);
 		free(string);
 		free(data);
