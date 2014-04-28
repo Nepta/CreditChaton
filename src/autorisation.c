@@ -92,9 +92,9 @@ void printHelp(const char* programName){
 
 void* authenticate(void* pipe_){
 	int *pipe = pipe_;
-	char* cardNumber = malloc(16+1);
-	char* messageType = malloc(7+1);
-	char* value = malloc(13+1); // only 13 digit needed for the richest of the world
+	char cardNumber[16+1];
+	char messageType[7+1];
+	char value[13+1]; // only 13 digit needed for the richest of the world
 	char* string;
 	char end = 0;
 	while(!end){
@@ -107,7 +107,8 @@ void* authenticate(void* pipe_){
 			fprintf(stderr,"%s\n",string);
 			end = 1;
 		}
-		if(exist(data,cardNumber)){
+		int dsId = exist(data,cardNumber);
+		if(dsId != -1 && balance(data,dsId,value) > 0){
 			sprintf(string,"|%s|Réponse|%d|\n",cardNumber,ACK);
 		}else{
 			sprintf(string,"|%s|Réponse|%d|\n",cardNumber,NACK);

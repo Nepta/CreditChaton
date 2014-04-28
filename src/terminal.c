@@ -42,13 +42,15 @@ int main(int argc, char* argv[]){
 		mkfifo(bankFifo,DEFAULT);
 		int bank = open(bankFifo,O_WRONLY);
 		char accountId[17];
+		char money[14];
 		int i = 0;
 		while(!end){
 			i++;
 			accountId[0] = '\0';
+			money[0] = '\0';
 		 	printf("card code:\n> ");
 		 	fflush(stdout);
-		 	scanf("%16s",accountId);
+		 	scanf("%16s%13s",accountId,money);
 		 	scanf("%*[^\n]"); // clean stdin
 			printf("%s\n",accountId);
 			if(strlen(accountId) < 16){

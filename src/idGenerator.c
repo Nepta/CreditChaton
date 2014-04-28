@@ -4,12 +4,21 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <time.h>
+#include <inttypes.h>
 
 struct option longopts[] = {
 	{"bank",	required_argument, 0, 'b'},
 	{"num", required_argument, 0, 'n'},
 	{"unrandomize", no_argument, 0, 'u'}
 };
+
+typedef union{
+	struct money{
+		uint32_t moneyLSB;
+		uint32_t moneyMSB;
+	}split;
+	unsigned long long all;
+}Money;
 
 void printHelp(char* programName);
 
@@ -43,13 +52,16 @@ int main(int argc, char* argv[]){
 			int secondTuple = rand()%10000;
 			int thirdTuple = rand()%10000;
 			int lastTuple = rand()%10000;
+			Money money;
+			money.split.moneyMSB = rand()&255;
+			money.split.moneyLSB = rand();
 			if(unrandomize){
 				lastTuple = getpid()%10000;
 			}
 			if(bankId){
-				printf("%4s%04d%04d%04d\n",bankId,secondTuple,thirdTuple,lastTuple);
+				printf("%4s%04d%04d%04d%013llu\n",bankId,secondTuple,thirdTuple,lastTuple,money.all);
 			}else{
-				printf("%04d%04d%04d%04d\n",firstTuple,secondTuple,thirdTuple,lastTuple);
+				printf("%04d%04d%04d%04d%013llu\n",firstTuple,secondTuple,thirdTuple,lastTuple,money.all);
 			}
 		}
 	}else{
