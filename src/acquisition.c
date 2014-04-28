@@ -72,27 +72,20 @@ int main(int argc, char* argv[]){
 		pthread_t remoteThread;
 		pthread_create(&remoteThread,NULL,remoteResponse,NULL);
 		pthread_create(&remoteThread, NULL, (void* (*) (void*))routeRemoteRequest, (void*)&bankPath);
-		
 		while(!end){
 			string = litLigne(bank);
+			errno = 0;
 			if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
 				perror("(acquisition)message in wrong format");
+				fprintf(stderr,"%s:%d: [bank %s] %s",__FILE__,__LINE__,bankId,string);
 				end = 1;
 				continue;
 			}
 			
-			if(strcmp(messageType,"Demande") == 0){ //from terminal
-				if(strncmp(cardNumber,bankId,4) == 0){ // to autorisation
-					ecritLigne(localAuth,string);
-				}else{ // to interbancaire
-					ecritLigne(localInter,string);
-				}
-			}else{  //from autorisation / to terminal
-				char fifo[64] = {0}; // resources/ + card code + .fifo + '\0' = 32
-				sprintf(fifo,"%s/%s.fifo",bankPath,cardNumber);
-				int term = open(fifo,O_WRONLY);
-				ecritLigne(term,string);
-				close(term);
+			if(strncmp(cardNumber,bankId,4) == 0){
+				ecritLigne(localAuth,string);
+			}else{ // to interbancaire
+				ecritLigne(localInter,string);
 			}
 			free(string);
 		}
@@ -148,7 +141,7 @@ void* remoteResponse(){
 	char bankPath[32] = {0};
 	sprintf(bankPath,"resources/bank%.4s",bankId);
 	char fifoPath[64] = {0};
-	sprintf(fifoPath,"%s/remoteResponse.fifo",bankPath);
+	sprintf(fifoPath,"%s/response.fifo",bankPath);
 	mkfifo(fifoPath,DEFAULT);
 	int remoteResponseFD = open(fifoPath,O_RDONLY);
 	
@@ -156,7 +149,7 @@ void* remoteResponse(){
 	int end = 0;
 	while(!end){
 		char cardNumber[16+1];
-		char messageType[7+1];
+		char messageType[8+1];
 		char value[13+1]; // only 13 digit needed for the richest man of the world
 		char* string = litLigne(remoteResponseFD);
 		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){

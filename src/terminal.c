@@ -69,9 +69,9 @@ int main(int argc, char* argv[]){
 			
 			int ack = (int)(string[27] - '0');
 			if(ack){
-				printf(" transaction %d accepted\n",i);
+				printf(" transaction accepted\n");
 			}else{
-				printf(" transaction %d refused\n",i);
+				printf(" transaction refused\n");
 			}
 			free(string);
 		}

@@ -54,7 +54,7 @@ int main(int argc, char* argv[]){
 		mkfifo(pipeName,DEFAULT);
 		int localDemand = open(pipeName,O_RDONLY);
 		
-		sprintf(pipeName,"%s/input.fifo",bankPath);
+		sprintf(pipeName,"%s/response.fifo",bankPath);
 		mkfifo(pipeName,DEFAULT);
 		int localResponse = open(pipeName,O_WRONLY);
 		

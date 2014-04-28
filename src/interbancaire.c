@@ -42,21 +42,36 @@ int main(int argc, char* argv[]){
 	opterr = 0;
 	int indexptr;
 	int opt;
+	char* *bankList = NULL;
+	int bankListSize;
 	while((opt = getopt_long(argc, argv, "j:f:",longopts, &indexptr)) != -1){
 		switch(opt){
 			case 'j':
 				poolSize = atoi(optarg);
 				break;
 			case 'f':
-/*				bankList = open(optarg,O_RDONLY|O_NONBLOCK);*/
+				{}FILE *bankListFile = fopen(optarg,"r");
+				fseek(bankListFile, 0, SEEK_END);
+				int fileSize = ftell(bankListFile);
+				fseek(bankListFile, 0, SEEK_SET);
+				bankListSize = fileSize/5;
+				bankList = malloc(bankListSize);
+				char* bankList_ = malloc(bankListSize*4+2);
+				for(int i=0; i<bankListSize; i++){
+					fread(bankList_+(i*4), 1, 5, bankListFile);
+					bankList[i] = bankList_+(i*4);
+				}
+				fclose(bankListFile);
 				break;
 			default:
 				printHelp(argv[0]);
 				return argc;
 		}
 	}
-	char* bankList[] = {"0000","1111"};
-	int bankListSize = 2;
+	if(!bankList){
+		printHelp(argv[0]);
+		return argc;
+	}
 	pipe(threadPoolPipe);
 	
 	pthread_t threadId[bankListSize];
@@ -71,7 +86,7 @@ int main(int argc, char* argv[]){
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe[READ] = open(fifoPath,O_RDONLY);
 
-		sprintf(fifoPath,"%s/remoteResponse.fifo",bankPath);
+		sprintf(fifoPath,"%s/response.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe[WRITE] = open(fifoPath,O_WRONLY);
 		pthread_create(&threadId[i], NULL, (void* (*) (void*))connection, (void*)remotePipe);
@@ -156,7 +171,7 @@ void* remoteAuth(){
 void printHelp(char* programName){
 	fprintf(	stderr,
 				"Usage : %s [OPTION]...\n"
-				"  -f,--file\t a file containing a list of bankId\n"
+				"  -f,--file\t a file containing a list of bankId (mandatory)\n"
 				"  -j,--jobs\t number of slot available for concurrent routing\n",
 				programName
 	);
