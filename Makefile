@@ -58,10 +58,13 @@ doxygen:
 	@echo "==== Building doxygen ===="
 	@doxygen doc/Doxyfile
 
-run:
+run: annuaire
 	@echo "==== Runing auth and terminal ===="
 	@${MAKE} -s --no-print-directory -C . -f run.make
 
+annuaire: randGen
+	@echo "==== Creating annuaires files ===="
+	@/bin/bash -c 'for d in resources/bank*/; do bankId=$${d:14:4}; ./randGen -b $$bankId -n $$(($$RANDOM%1000)) > $${d}annuaire.txt ; done'
 
 help:
 	@echo "Usage: make [config=name] [target]"
