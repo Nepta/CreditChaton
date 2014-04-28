@@ -6,7 +6,7 @@ ifndef config
 endif
 export config
 
-PROJECTS := terminal randGen autorisation acquisition interbancaire fileToDescriptor libCarteBancaire libAnnuaire
+PROJECTS := terminal randGen autorisation acquisition interbancaire libCarteBancaire libAnnuaire
 
 .PHONY: all clean help $(PROJECTS)
 
@@ -32,10 +32,6 @@ interbancaire: libCarteBancaire libAnnuaire
 	@echo "==== Building interbancaire ($(config)) ===="
 	@${MAKE} --no-print-directory -C . -f interbancaire.make
 
-fileToDescriptor: libCarteBancaire
-	@echo "==== Building fileToDescriptor ($(config)) ===="
-	@${MAKE} --no-print-directory -C . -f fileToDescriptor.make
-
 libCarteBancaire: 
 	@echo "==== Building libCarteBancaire ($(config)) ===="
 	@${MAKE} --no-print-directory -C . -f libCarteBancaire.make
@@ -50,7 +46,6 @@ clean:
 	@${MAKE} --no-print-directory -C . -f autorisation.make clean
 	@${MAKE} --no-print-directory -C . -f acquisition.make clean
 	@${MAKE} --no-print-directory -C . -f interbancaire.make clean
-	@${MAKE} --no-print-directory -C . -f fileToDescriptor.make clean
 	@${MAKE} --no-print-directory -C . -f libCarteBancaire.make clean
 	@${MAKE} --no-print-directory -C . -f libAnnuaire.make clean
 
@@ -91,7 +86,6 @@ help:
 	@echo "   autorisation"
 	@echo "   acquisition"
 	@echo "   interbancaire"
-	@echo "   fileToDescriptor"
 	@echo "   libCarteBancaire"
 	@echo "   libAnnuaire"
 	@echo "   debug"
