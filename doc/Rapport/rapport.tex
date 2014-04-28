@@ -231,14 +231,15 @@ Ce serveur est connecté à deux tubes en écriture et deux tubes en lecture.
 \begin{description}
 	\item[resources/bank<bankId>/localAuth.fifo] (read) permet de recevoir des demande d'autorisation du serveur d'acquisition
 	\item[resources/bank<bankId>/remoteAuthDemande.fifo] (read) permet de recevoir des demandes venant du serveur interbancaire
-	\item[resources/bank<bankId>/input.fifo] (write) permet d'envoyer les réponses au serveur d'acquisition
+	\item[resources/bank<bankId>/response.fifo] (write) permet d'envoyer les réponses au serveur d'acquisition
 	\item[resources/bank<bankId>/remoteInput.fifo] (write) permet d'envoyer des réponses au serveur interbancaire
 \end{description}
 \graph{0.5}{autorisation}
 \subsection{Acquisition}
 Ce serveur est connecté à 2 tubes en lecture et 5 tubes en écriture.
 \begin{description}
-	\item[resources/bank<bankId>/input.fifo] (read) permet de recevoir des demandes ou des réponses locales à traiter
+	\item[resources/bank<bankId>/input.fifo] (read) permet de recevoir des demandes locales à traiter
+	\item[resources/bank<bankId>/response.fifo] (read) permet de recevoir réponses locales à traiter
 	\item[resources/bank<bankId>/remoteInput.fifo] (read) permet de recevoir des demandes ou des réponses distantes à traiter
 	\item[resources/bank<bankId>/localAuth.fifo] (write) permet d'envoyer des demandes d'autorisation locales
 	\item[resources/bank<bankId>/interRemoteDemande.fifo] (write) permet d'envoyer des demandes d'autorisation au serveur interbancaire
@@ -254,11 +255,9 @@ Ainsi pour n banques reliées, il gère 4n tubes en lecture et 2n tubes en écri
 
 \begin{description}
 	\item[resources/bank<bankId>/interRemoteDemande.fifo] (read) permet de recevoir des demandes d'autorisation d'une banque
-	\item[resources/bank<bankId>/input.fifo] (read) permet de recevoir des demandes ou des réponses locales à traiter
 	\item[resources/bank<bankId>/remoteInput.fifo] (read) permet de recevoir des demandes ou des réponses distantes à traiter
 	\item[resources/bank<bankId>/interRéponse.fifo] (read) permet de recevoir une réponse d'un serveur d'autorisation d'une banque
-	\item[resources/bank<bankId>/input.fifo] (write) permet d'envoyer des réponses distantes à une banque
-	\item[resources/bank<bankId>/remoteInput.fifo] (write) permet d'envoyer des demandes d'autorisation à une banque
+	\item[resources/bank<bankId>/response.fifo] (write) permet d'envoyer des réponses distantes à une banque
 \end{description}
 \graph{0.5}{interbancaire}
 
@@ -304,7 +303,86 @@ En plus de cela, chacun des threads devra pour ne pas bloquer le broadcast, cont
 \noindent
 Il se pose alors un problème de scalabilité, afin de pouvoir simplement augmenter les performances en lançant un deuxième serveur interbancaire, chaque sous routine de broadcast devra pouvoir communiquer entre-elles afin qu'un broadcast d'un serveur interbancaire soit répercuté sur chacun des serveurs interbancaires lancés.
 
+\subsection{Interblocage}
+Pour voir si il est possible d'avoir des interblocage, regardons le chemin que prend un message de la demande à sa réponse depuis un terminal.
+\graph{0.4}{interblocage}
 
+Sont représenté ici les chemin d'un message de terminaux de la banque crédit chaton faisant des demandes locales et distante (vers bénépé).
+Sur leurs chemins nous voyons que ces deux demandes se croisent déjà au niveau du tube \og input\fg{} de la banque crédit chaton, des croisement non visible sur le graph peuvent aussi se produire au niveau de tous les tubes connecté aux serveur interbancaire, sauf à ceux indiquer par un petit cadenas ainsi que les tube accessible à partir d'eux.
+Nous noterons qu'il n'y a pas de tube qui contient à la fois des messages de demande et de réponse.
+Lors de la lecture d'un message par un serveur, il est toujours possible par le thread qui le lit, d'obtenir le fichier dans lequel écrire de plus chaque message est router directement sans mise en mémoire par les serveur, la temporisation se faisait par la structure interne des tubes.
+Dans le cas d'un tube plein, lors de l'écriture, acquisition peut toujours écrire dans le tube de réception des terminaux, ceux-ci étant unique et ne contenant qu'un seul message.
+Chaque message finissant sont trajet dans ces tubes (tube de réception des terminaux), finirons par passer un moment ou à un autre à travers les différents tubes qui se viderons peu à peu les débloquant éventuellement.
+Les différents serveurs serons donc en attente pendant ce temps les lectures et écritures dans les tubes étant bloquantes.
+
+\section{Bugs}
+Un certain nombres de problèmes connu existe encore au niveau de cette simulation.
+\begin{itemize}
+\item Lors de la fermeture d'un terminal, un message NULL est lu par le serveur d'acquisition, n'étant pas au bon format celui-ci s'arrête.
+\item de la même manière, en connectant la sortie de randGen (nous parlerons de ce programme dans 2 section), un même message NULL est reçu par acquisition l'arrêtant aussi.
+\item l'utilisation simultané de deux serveur interbancaire peut potentiellement bloquer toute la simulation, les thread de travail étant bloqué jusqu'à l'obtention d'une réponse.
+\item Un serveur d'acquisition peut rester bloquer si un terminal associé n'est pas lancer, il attend l'ouverture du tube \og input.fifo\fg{} en écriture pour pouvoir continuer, une solution peut être de lancer cette commande:\\
+\vspace{-1em}
+\begin{verbatim}
+	$ cat /dev/null > resources/<bankId>/input.fifo
+\end{verbatim}
+\item Le système est conçu pour être scalable assez simplement en exécutant plusieurs fois un serveur, il se connectera aux unique tubes d'entrée/sortie par banque parrallélisant ainsi le traitement de donnée, cependant le protocole ne permet pas d'obtenir des processus \og thread safe\fg{}, les demandes ayant des tailles variable, nous somme obliger de lire un a un les caractère d'un tube ce qui, si fait par plusieurs processus en même temps, peut donner un mélange de deux messages différents, une solution serait d'avoir des messages à taille fixe et lire d'un coup toute la trame (read est thread safe pour des lectures de moins de 512 octets).
+\end{itemize}
+
+\section{Tests}
+Afin de tester indépendemment chaque serveur, il faut créer les différents tubes à la main et écrire et lire directement dedans, ces tests n'étant qu'une validation rapides des différents serveurs, aucun script n'a été conçu pour en facilité la tâche, il faut donc à la main forger des messages et les envoyer aux différents serveur.\\
+
+Exemple: \vspace{-0.9em}
+\begin{verbatim}
+	$ echo 11111018738962640674825418319 | ./terminal -b 1111&
+	$ cat resourcces/bank1111/input.fifo&
+	$ echo "|1111101873896264|Réponse|0|" >> resources/bank1111/1111101873896264.fifo
+\end{verbatim}
+
+\section{Autres programmes}
+En plus des différents serveurs de la simulation, il y a un autre programme ainsi qu'un script bash servant à d'en automatiser le lancement et son utilisation.
+Le programme du nom de \og randGen\fg{} permet de générer aléatoirement des numéro de carte bancaire et des annuaires.
+Les scripts bash eux permettent de générer les annuaires et de les placers aux bons endroits ainsi que de lancer une simulation.
+
+\section{Utilisation}
+Pour démarrer une simulation, un certain nombres de serveurs doivent être lancé.
+La banque, qui est en ensemble de deux serveurs (autorisation et acquisition), en leurs passant la banque qu'ils représentent en paramètre.
+\begin{verbatim}
+	$ ./acquisition -b 1234 &
+	$ ./autorisation -b 1234 &
+\end{verbatim}
+
+Le serveur interbancaire avec en paramètre l'emplacement d'un fichier d'annuaire contenant les ids des differentes banque (un id de 4 chiffres par ligne) et éventuellement le nombres de resources disponible (par défaut une seul)
+\begin{verbatim}
+	$ ./interbancaire -f resources/bank.txt -j 42 &
+\end{verbatim}
+
+et enfin un terminal associé à une banque
+\begin{verbatim}
+	$ ./terminal -b 1234
+\end{verbatim}
+
+A noter qu'il faut avant le lancement des serveurs d'autorisation générer des annuaires dans le dossier resources/bankId/annuaire.txt avec pour format:
+pour chaque ligne (de 29 caractère), les 16 chiffre du numéro de carte de crédit suivit sans séparateur du crédit (en centimes) du compte associé.
+Nous pouvons utiliser pour cela le programme \og randGen\fg{}
+\begin{verbatim}
+	$ mkdir resources/bank1234/
+	$ ./randGen -b 1234 -n 100 > resources/bank1234/annuaire.txt
+\end{verbatim}
+
+Enfin, pour utiliser les terminaux, l'utilisateur doit rentrer sont numéro de carte de crédit suivit immédiatement du montant de la transaction en centimes (29 caractère).
+Encore une fois, randGen peut être utilisé.
+\begin{verbatim}
+	$ ./randGen -n 5000 -b 0000 -u |./terminal -b 1234
+\end{verbatim}
+
+Tout ceci peut aussi se faire automatique en lançant la simple commande
+\begin{verbatim}
+	$ make run
+\end{verbatim}
+qui lancera les différents serveurs (bank 0000 et 1111), ainsi que deux terminaux faisant 5000 demandes pour la banque 1111
+
+\section{Scalabilité}
 
 \section{Questions pré-projet}
 \begin{enumerate}

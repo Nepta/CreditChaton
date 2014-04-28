@@ -176,8 +176,6 @@ void* remoteResponse(){
 void printHelp(const char* programName){
 	fprintf(	stderr,
 				"Usage : %s [OPTION]...\n"
-				"  -i,--input\t file descriptor to read into (mandatory)\n"
-				"  -o,--output\t file descriptor to write into (mandatory)\n"
 				"  -b,--bank\t bank id (mandatory)\n",
 				programName
 	);
