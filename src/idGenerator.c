@@ -6,7 +6,7 @@
 #include <time.h>
 
 struct option longopts[] = {
-	{"bank",	required_argument, 0, 'b'},
+	{"bank",	optional_argument, 0, 'b'},
 	{"num", required_argument, 0, 'n'},
 	{"unrandomize", no_argument, 0, 'u'}
 };
@@ -14,14 +14,14 @@ struct option longopts[] = {
 void printHelp(char* programName);
 
 int main(int argc, char* argv[]){
-	if(argc == 5 || argc == 6){
+	if(argc == 3 || argc == 4 || argc == 6){
 		opterr = 0;
 		int indexptr;
 		int opt;
-		char* bankId;
+		char* bankId = 0;
 		int num;
 		int unrandomize = 0;
-		while((opt = getopt_long(argc, argv, "b:n:u",longopts, &indexptr)) != -1){
+		while((opt = getopt_long(argc, argv, "n:ub",longopts, &indexptr)) != -1){
 			switch(opt){
 				case 'b':
 					bankId = optarg;
@@ -34,28 +34,35 @@ int main(int argc, char* argv[]){
 					break;
 				default:
 					printHelp(argv[0]);
-					break;
+					return 1;
 			}
 		}
 		srand(time(0));
 		for(int i=0; i<num; i++){
+			int firstTuple = rand()%10000;
 			int secondTuple = rand()%10000;
 			int thirdTuple = rand()%10000;
 			int lastTuple = rand()%10000;
 			if(unrandomize){
 				lastTuple = getpid()%10000;
 			}
-			printf("%4s%04d%04d%04d\n",bankId,secondTuple,thirdTuple,lastTuple);
+			if(bankId){
+				printf("%4s",bankId);
+			}else{
+				printf("%04d",firstTuple);
+			}
+			printf("%04d%04d%04d\n",secondTuple,thirdTuple,lastTuple);
 		}
 	}else{
 		printHelp(argv[0]);
 	}
+ return 0;
 }
 
 void printHelp(char* programName){
 	fprintf(	stderr,
 				"Usage : %s [OPTION]...\n"
-				"  -b,--bank\t bank id (mandatory)\n"
+				"  -b,--bank\t bank id\n"
 				"  -n,--num\t number of card id to generate (mandatory)\n"
 				"  -u,--unrandomize\t set the last four digit of card to have a less random id\n",
 				programName
