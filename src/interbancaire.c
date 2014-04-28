@@ -71,7 +71,7 @@ int main(int argc, char* argv[]){
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe[READ] = open(fifoPath,O_RDONLY);
 
-		sprintf(fifoPath,"%s/remoteResponse.fifo",bankPath);
+		sprintf(fifoPath,"%s/input.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe[WRITE] = open(fifoPath,O_WRONLY);
 		pthread_create(&threadId[i], NULL, (void* (*) (void*))connection, (void*)remotePipe);
@@ -89,17 +89,8 @@ int main(int argc, char* argv[]){
  return 0;
 }
 
-void getPipe(ConnectionPipe *remotePipe, int bankId){
-	
-}
-
 void* connection(int *associatedBank_){
 	int associatedBank[] = {associatedBank_[0], associatedBank_[1]};
-	char fifoPath[64] = {0};
-	char bankPath[32] = {0};
-	sprintf(bankPath,"resources/bank%.4s",bankId);
-	mkdir(bankPath,0755);
-
 	char cardNumber[16+1];
 	char messageType[7+1];
 	char value[13+1]; // only 13 digit needed for the richest man of the world
@@ -119,14 +110,24 @@ void* connection(int *associatedBank_){
 		char bankId[5];
 		sprintf(bankId,"%.4s",cardNumber);
 		remotePipe->bankId = atoi(bankId);
-		remotePipe->interDemand = interDemand
-		remotePipe->interResponse = interResponse;
+		
+		char bankPath[20] = {0};
+		sprintf(bankPath,"resources/bank%.4s",bankId);
+		mkdir(bankPath,0755);
+		char fifoPath[64] = {0};
 
+		sprintf(fifoPath,"%s/remoteInput.fifo",bankPath);
+		mkfifo(fifoPath,DEFAULT);
+		remotePipe->interDemand = open(fifoPath,O_WRONLY);
+
+		sprintf(fifoPath,"%s/interRéponse.fifo",bankPath);
+		mkfifo(fifoPath,DEFAULT);
+		remotePipe->interResponse = open(fifoPath,O_RDONLY);
+		
 		RemoteAuthData *data = malloc(sizeof (RemoteAuthData));
 		data->pipe = remotePipe;
 		data->string = string;
 		write(threadPoolPipe[WRITE], &data, sizeof (void*));
-		fprintf(stderr,"%s:%d: fd:%d\n",__FILE__,__LINE__,remotePipe->interResponse);
 	}
 	return (void*)1;
 }
@@ -141,16 +142,12 @@ void* remoteAuth(){
 		free(string);
 		string = litLigne(remotePipe->interResponse);
 		pthread_mutex_unlock(bank+remotePipe->bankId);
-		
 		ecritLigne(remotePipe->bankResponse, string);
 		close(remotePipe->interDemand);
 		close(remotePipe->bankResponse);
 		free(remotePipe);
 		free(string);
 		free(data);
-		close(remotePipe->interDemand);
-		close(remotePipe->interResponse);
-		close(remotePipe->bankResponse);
 	}
  return 0;
 }
