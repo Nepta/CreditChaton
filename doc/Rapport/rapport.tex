@@ -155,8 +155,8 @@
 \end{center}
 \medskip
 
-Tout au long de se manuel, nous utiliserons la notion de connexion local et distante.
-Une connexion local signifie qu'un terminal associé à une banque émet une demande pour un débit sur un compte de cette même banque (terminal crédit chaton utiliser par un client de crédit chaton), alors qu'une connexion distante ce réfère à un client utilisant un terminal associé à une autre banque (client de la bénépé utilisant un terminal de crédit chaton).
+Tout au long de ce manuel, nous utiliserons la notion de connexion local et distante.
+Une connexion local signifie qu'un terminal associé à une banque émet une demande pour un débit sur un compte de cette même banque (terminal crédit chaton utilisé par un client de crédit chaton), alors qu'une connexion distante ce réfère à un client utilisant un terminal associé à une autre banque (client de la bénépé utilisant un terminal de crédit chaton).
 Ces deux cas traiter par le même serveur d'acquisition sont router différemment et passe par deux partie différente de l'application.
 
 \section{Serveurs mis en place}
@@ -167,9 +167,9 @@ Pour cette simulation, un minimum de 3 serveurs sont nécessaire afin d'effectue
 Les 3 serveurs permettant les connexions locales sont les suivant:
 
 \begin{itemize}
-\item Terminal
-\item Acquisition
-\item Autorisation
+	\item Terminal
+	\item Acquisition
+	\item Autorisation
 \end{itemize}
 
 Afin de permettre un connexion distante, il faut rajouter pour cela le serveur Interbancaire, connecté a un autre couple de serveur Acquisition/Autorisation associé à une banque.
@@ -186,7 +186,7 @@ Une fois cette demande traité, le serveur d'autorisation renverra au serveur d'
 
 \subsection{Distante}
 Pour l'utilisation d'un terminal d'une autre banque, le chemin est légèrement plus long.
-Le serveur d'acquisition en récuperant une demande dont ayant un identifiant de banque différent du sien, enverra la demande au serveur interbancaire, a travers un tube qui lui est propre.\\
+Le serveur d'acquisition, qui récupère une demande avec un identifiant de banque différent du sien, enverra la demande au serveur interbancaire à travers un tube qui lui est propre.\\
 \noindent
 Le serveur interbancaire possède pour chaque tube relié à une banque, un thread s'occupant d'encapsuler la demande en y rajoutant, la banque émettant la demande, la banque à laquelle est destiné cette demande ainsi que la demande en elle même avant de l'envoyer a travers un tube relié à la partie centrale du serveur s'occupant de router ces demande, d'en attendre la réponse et la renvoyer à la bonne banque.
 Cette partie est implementé sous la forme d'une piscine de processus léger (thread pool) dont le nombre limite la quantité de demande simultané qu'elle peut traiter.\\
@@ -271,7 +271,7 @@ Le terminal après avoir reçu une requête directement de l'entrée standard (s
 Le serveur d'autorisation est découper en deux partie exécutant la même fonction ayant pour différence la paire de tube connecté à ces threads.
 Ils reçoivent tout deux une demande sur leurs tube ouvert en lecture pour vérifier dans leurs annuaire la validité de la transaction, puis renvoient une réponse sur les tubes ouvert en écriture correspondant.
 L'annuaire est mise en mémoire depuis un fichier contenant un numéro de carte bancaire suivit de la somme disponible sur le compte et ce pour chaque ligne du fichier.
-Cette annuaire est formé par une structure contenant la taille de cette structure (correspondant au nombre de ligne du fichier chargé) et d'un tableau flexible de chaîne de caractère.
+Cet annuaire est formé par une structure contenant la taille de cette structure (correspondant au nombre de ligne du fichier chargé) et d'un tableau flexible de chaîne de caractère.
 \graph{0.4}{autorisationState}
 
 \subsection{Acquisition}
@@ -298,7 +298,7 @@ Pour l'instant n'ayant pas implémenté un design plus souple et hautement plus 
 \graph{0.4}{piscine}
 
 
-\subsubsection{Design plus souple et hautment plus compliqué}
+\subsubsection{Design plus souple et hautement plus compliqué}
 La solution pensé pour permettre a chaque thread de pouvoir recevoir la demande qu'il attendent serait de simplement broadcaster toute les réponses à tous les threads, c'est a dire crée un deuxième tube reliant chacun des thread à une sous routine \og broadcast\fg{} servant à copier les réponses à un tube dédié sur les processus de travail.
 En plus de ça, chacun des threads devra pour ne pas bloquer le broadcast, continuellement lire ce tube afin de rejeter les réponses qu'il n'attendent pas, en fonction d'un filtre mis en place avant l'envoi d'une demande.\\
 \noindent
