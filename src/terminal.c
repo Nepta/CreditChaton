@@ -52,7 +52,6 @@ int main(int argc, char* argv[]){
 		 	fflush(stdout);
 		 	scanf("%16s%13s",accountId,money);
 		 	scanf("%*[^\n]"); // clean stdin
-			printf("%s -> %s\n",accountId, money);
 			if(strlen(money) < 13){
 				end = 1;
 				continue;
