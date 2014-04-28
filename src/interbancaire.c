@@ -116,12 +116,12 @@ void* connection(int *associatedBank_){
 		sprintf(bankPath,"resources/bank%.4s",bankId);
 		mkdir(bankPath,0755);
 		char fifoPath[64] = {0};
-		sprintf(fifoPath,"%s/remoteInput.fifo",bankPath);
 
+		sprintf(fifoPath,"%s/remoteInput.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe->interDemand = open(fifoPath,O_WRONLY);
-		sprintf(fifoPath,"%s/interRéponse.fifo",bankPath);
 
+		sprintf(fifoPath,"%s/interRéponse.fifo",bankPath);
 		mkfifo(fifoPath,DEFAULT);
 		remotePipe->interResponse = open(fifoPath,O_RDONLY);
 		
