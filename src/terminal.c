@@ -52,12 +52,12 @@ int main(int argc, char* argv[]){
 		 	fflush(stdout);
 		 	scanf("%16s%13s",accountId,money);
 		 	scanf("%*[^\n]"); // clean stdin
-			printf("%s\n",accountId);
-			if(strlen(accountId) < 16){
+			printf("%s -> %s\n",accountId, money);
+			if(strlen(money) < 13){
 				end = 1;
 				continue;
 			}
-			string = message(accountId,"Demande","1");
+			string = message(accountId,"Demande",money);
 			ecritLigne(bank,string);
 			
 			sprintf(responseFifo,"resources/bank%.4s/%.16s.fifo",bankId,accountId);

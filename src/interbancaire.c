@@ -46,7 +46,6 @@ int main(int argc, char* argv[]){
 		switch(opt){
 			case 'j':
 				poolSize = atoi(optarg);
-				fprintf(stderr,"%s:%d: poolSize: %d\n",__FILE__,__LINE__,poolSize);
 				break;
 			case 'f':
 /*				bankList = open(optarg,O_RDONLY|O_NONBLOCK);*/

@@ -59,7 +59,7 @@ int main(int argc, char* argv[]){
 				lastTuple = getpid()%10000;
 			}
 			if(bankId){
-				printf("%4s%04d%04d%04d%013llu\n",bankId,secondTuple,thirdTuple,lastTuple,money.all);
+				printf("%.4s%04d%04d%04d%013llu\n",bankId,secondTuple,thirdTuple,lastTuple,money.all);
 			}else{
 				printf("%04d%04d%04d%04d%013llu\n",firstTuple,secondTuple,thirdTuple,lastTuple,money.all);
 			}

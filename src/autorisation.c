@@ -43,11 +43,12 @@ int main(int argc, char* argv[]){
 					break;
 			}
 		}
-		data = load("resources/annuaire.txt");
 		char bankPath[20] = {0};
 		char pipeName[64] = {0};
 		sprintf(bankPath,"resources/bank%.4s",bankId);
 		mkdir(bankPath,0755);
+		sprintf(pipeName,"%s/annuaire.txt",bankPath);
+		data = load(pipeName);
 		
 		sprintf(pipeName,"%s/localAuth.fifo",bankPath);
 		mkfifo(pipeName,DEFAULT);
