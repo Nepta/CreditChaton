@@ -13,14 +13,20 @@
 #include "annuaire.h"
 
 static const int DEFAULT = 0644;
-static int bank[10000];
-int searchBank(char bankId[5]);
+static pthread_mutex_t bank[10000] = {PTHREAD_MUTEX_INITIALIZER};
 void* connection(int pipe[2]);
+void printHelp(char* programName);
+
+struct option longopts[] = {
+	{"file", required_argument, 0, 'f'},
+	{"jobs", required_argument, 0, 'j'}
+};
 
 typedef struct{
 	int interResponse;
 	int interDemand;
 	int bankResponse;
+	int bankId;
 }ConnectionPipe;
 
 typedef struct{
@@ -32,11 +38,27 @@ void* remoteAuth();
 static int threadPoolPipe[2];
 
 int main(int argc, char* argv[]){
+	int poolSize = 1;
+	opterr = 0;
+	int indexptr;
+	int opt;
+	while((opt = getopt_long(argc, argv, "j:f:",longopts, &indexptr)) != -1){
+		switch(opt){
+			case 'j':
+				poolSize = atoi(optarg);
+				fprintf(stderr,"%s:%d: poolSize: %d\n",__FILE__,__LINE__,poolSize);
+				break;
+			case 'f':
+/*				bankList = open(optarg,O_RDONLY|O_NONBLOCK);*/
+				break;
+			default:
+				printHelp(argv[0]);
+				return argc;
+		}
+	}
 	char* bankList[] = {"0000","1111"};
 	int bankListSize = 2;
-	int poolSize = 9;
 	pipe(threadPoolPipe);
-
 	
 	pthread_t threadId[bankListSize];
 	for(int i=0; i<bankListSize; i++){
@@ -68,11 +90,6 @@ int main(int argc, char* argv[]){
  return 0;
 }
 
-int searchBank(char bankId[5]){
-	bankId[4] = '\0';
-	return bank[atoi(bankId)];
-}
-
 void* connection(int *associatedBank_){
 	int associatedBank[] = {associatedBank_[0], associatedBank_[1]};
 	char cardNumber[16+1];
@@ -80,6 +97,7 @@ void* connection(int *associatedBank_){
 	char value[13+1]; // only 13 digit needed for the richest man of the world
 	int end = 0;
 	while(!end){
+		errno = 0;
 		char* string = litLigne(associatedBank[READ]);
 		if(string == NULL || decoupe(string,cardNumber,messageType,value) == 0){
 			perror("(interbancaire(connection)) message is wrong format");
@@ -89,9 +107,13 @@ void* connection(int *associatedBank_){
 	
 		ConnectionPipe *remotePipe = malloc(sizeof (ConnectionPipe));
 		remotePipe->bankResponse = associatedBank[WRITE];
-	
+		
+		char bankId[5];
+		sprintf(bankId,"%.4s",cardNumber);
+		remotePipe->bankId = atoi(bankId);
+		
 		char bankPath[20] = {0};
-		sprintf(bankPath,"resources/bank%.4s",cardNumber);
+		sprintf(bankPath,"resources/bank%.4s",bankId);
 		mkdir(bankPath,0755);
 		char fifoPath[64] = {0};
 		sprintf(fifoPath,"%s/remoteInput.fifo",bankPath);
@@ -116,14 +138,25 @@ void* remoteAuth(){
 	while(read(threadPoolPipe[READ], &data, sizeof (void*)) != -1){
 		ConnectionPipe *remotePipe = data->pipe;
 		char* string = data->string;
+		pthread_mutex_lock(bank+remotePipe->bankId);
 		ecritLigne(remotePipe->interDemand, string);
 		free(string);
 		string = litLigne(remotePipe->interResponse);
+		pthread_mutex_unlock(bank+remotePipe->bankId);
 		ecritLigne(remotePipe->bankResponse, string);
 		free(remotePipe);
 		free(string);
 		free(data);
 	}
  return 0;
+}
+
+void printHelp(char* programName){
+	fprintf(	stderr,
+				"Usage : %s [OPTION]...\n"
+				"  -f,--file\t a file containing a list of bankId\n"
+				"  -j,--jobs\t number of slot available for concurrent routing\n",
+				programName
+	);
 }
 

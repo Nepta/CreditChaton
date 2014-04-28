@@ -64,7 +64,7 @@ run: annuaire
 
 annuaire: randGen
 	@echo "==== Creating annuaires files ===="
-	@/bin/bash -c 'for d in resources/bank*/; do bankId=$${d:14:4}; ./randGen -b $$bankId -n $$(($$RANDOM%1000)) > $${d}annuaire.txt ; done'
+	@/bin/bash -c 'for d in resources/bank*/; do bankId=$${d:14:4}; ./randGen -b $$bankId -n $$(($$RANDOM%1000)) > $${d}annuaire.txt 2> /dev/null ; done'
 
 help:
 	@echo "Usage: make [config=name] [target]"

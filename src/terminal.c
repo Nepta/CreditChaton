@@ -41,19 +41,24 @@ int main(int argc, char* argv[]){
 		sprintf(bankFifo,"resources/bank%.4s/input.fifo",bankId);
 		mkfifo(bankFifo,DEFAULT);
 		int bank = open(bankFifo,O_WRONLY);
-	 	char* account = malloc(10+16+5+1); // resources/ + card code + .fifo + '\0'
+		char accountId[17];
+		int i = 0;
 		while(!end){
+			i++;
+			accountId[0] = '\0';
 		 	printf("card code:\n> ");
-		 	scanf("%16s",account);
+		 	fflush(stdout);
+		 	scanf("%16s",accountId);
 		 	scanf("%*[^\n]"); // clean stdin
-			if(strlen(account) < 16){
+			printf("%s\n",accountId);
+			if(strlen(accountId) < 16){
 				end = 1;
 				continue;
 			}
-			string = message(account,"Demande","1");
+			string = message(accountId,"Demande","1");
 			ecritLigne(bank,string);
 			
-			sprintf(responseFifo,"resources/bank%.4s/%.16s.fifo",bankId,account);
+			sprintf(responseFifo,"resources/bank%.4s/%.16s.fifo",bankId,accountId);
 			mkfifo(responseFifo,DEFAULT);
 			int response = open(responseFifo,O_RDONLY);
 			free(string);
@@ -63,13 +68,12 @@ int main(int argc, char* argv[]){
 			
 			int ack = (int)(string[27] - '0');
 			if(ack){
-				printf("transaction accepted\n");
+				printf(" transaction %d accepted\n",i);
 			}else{
-				printf("transaction refused\n");
+				printf(" transaction %d refused\n",i);
 			}
 			free(string);
 		}
-		free(account);
 	}else{
 		printHelp(argv[0]);
 	}

@@ -6,7 +6,7 @@
 #include <time.h>
 
 struct option longopts[] = {
-	{"bank",	optional_argument, 0, 'b'},
+	{"bank",	required_argument, 0, 'b'},
 	{"num", required_argument, 0, 'n'},
 	{"unrandomize", no_argument, 0, 'u'}
 };
@@ -14,14 +14,14 @@ struct option longopts[] = {
 void printHelp(char* programName);
 
 int main(int argc, char* argv[]){
-	if(argc == 3 || argc == 4 || argc == 6){
+	if(argc == 3 || argc == 5 || argc == 6){
 		opterr = 0;
 		int indexptr;
 		int opt;
 		char* bankId = 0;
 		int num;
 		int unrandomize = 0;
-		while((opt = getopt_long(argc, argv, "n:ub",longopts, &indexptr)) != -1){
+		while((opt = getopt_long(argc, argv, "n:ub:",longopts, &indexptr)) != -1){
 			switch(opt){
 				case 'b':
 					bankId = optarg;
@@ -47,11 +47,10 @@ int main(int argc, char* argv[]){
 				lastTuple = getpid()%10000;
 			}
 			if(bankId){
-				printf("%4s",bankId);
+				printf("%4s%04d%04d%04d\n",bankId,secondTuple,thirdTuple,lastTuple);
 			}else{
-				printf("%04d",firstTuple);
+				printf("%04d%04d%04d%04d\n",firstTuple,secondTuple,thirdTuple,lastTuple);
 			}
-			printf("%04d%04d%04d\n",secondTuple,thirdTuple,lastTuple);
 		}
 	}else{
 		printHelp(argv[0]);
