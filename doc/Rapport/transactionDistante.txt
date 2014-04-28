@@ -1,0 +1,24 @@
+@startuml
+	participant terminal
+
+	box "Crédit Chaton" #99CCFF
+		participant acquisition as acqChaton
+		participant autorisation as authChaton
+	end box
+
+	participant interbancaire
+
+	box "Bénépé" #FFCC99
+		participant acquisition as acqBé
+		participant autorisation as authBé
+	end box
+
+	terminal -> acqChaton : demande
+	acqChaton -> interbancaire :demande
+	interbancaire -> acqBé : demande
+	acqBé -> authBé : demande
+	authBé --> acqBé : réponse
+	acqBé --> interbancaire : réponse
+	interbancaire --> acqChaton : réponse
+	acqChaton --> terminal : réponse
+@enduml

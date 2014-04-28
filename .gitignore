@@ -18,7 +18,8 @@ acquisition
 *.pdf
 *.gz
 *.toc
-doc/
+doc/*
+!/doc/Rapport
 lib*/
 interbancaire
 randGen

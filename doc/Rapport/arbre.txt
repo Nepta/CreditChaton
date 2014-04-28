@@ -1,0 +1,27 @@
+@startuml
+	component bash
+	() local as localAuth
+	() remote as remoteAuth
+	() local as localAcq
+	() remote as remoteAcq
+	
+	[Acquisition] <-u- bash
+	[Interbancaire] <-u- bash
+	[Autorisation] <-u- bash
+	[Terminal] <-u- bash
+
+	component " " as process
+	() " " as thread
+
+	Autorisation -d-> localAuth
+	Autorisation -d-> remoteAuth
+	
+	Acquisition -d-> localAcq
+	Acquisition -d-> remoteAcq
+	
+	Interbancaire -d-> Connection
+	Interbancaire -d-> threadPool
+	
+	note bottom of process : process
+	note bottom of thread : thread
+@enduml

@@ -1,0 +1,12 @@
+@startuml
+	participant terminal
+	box "Crédit Chaton" #99CCFF
+		participant acquisition
+		participant autorisation
+	end box
+
+	terminal -> acquisition : demande
+	acquisition -> autorisation :demande
+	autorisation --> acquisition : réponse
+	acquisition --> terminal : réponse
+@enduml
